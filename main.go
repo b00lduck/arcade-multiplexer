@@ -1,64 +1,45 @@
 package main
 
 import (
-	"io/ioutil"
-
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/all"
-
-	"image"
 	"os"
+	"os/signal"
+	"time"
 
-	"github.com/goiot/devices/monochromeoled"
-	"golang.org/x/exp/io/i2c"
-
-	_ "image/png"
+	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
+	"github.com/b00lduck/arcade-multiplexer/internal/oled"
+	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
+	"github.com/warthog618/gpio"
 )
 
 func main() {
 
-	d1 := []byte("17\n")
-	ioutil.WriteFile("/sys/class/gpio/unexport", d1, 0644)
+	// capture exit signals to ensure resources are released on exit.
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, os.Kill)
+	defer signal.Stop(quit)
 
-	if err := embd.InitGPIO(); err != nil {
-		panic(err)
-	}
-	defer embd.CloseGPIO()
-
-	led, err := embd.NewDigitalPin(17)
+	err := gpio.Open()
 	if err != nil {
 		panic(err)
 	}
-	defer led.Close()
-	if err := led.SetDirection(embd.In); err != nil {
-		panic(err)
+	defer gpio.Close()
+
+	hc595 := hc595.NewHc595(17, 27, 22)
+	hc595.SendByte(1023)
+	time.Sleep(1 * time.Second)
+	hc595.SendByte(0)
+
+	rotary := rotary.NewRotary(5, 6, 13)
+	defer rotary.Close()
+
+	oled := oled.NewOled("/dev/i2c-1")
+	defer oled.Close()
+
+	oled.ShowImage("./test.png")
+
+	select {
+	case <-time.After(time.Minute):
+	case <-quit:
 	}
 
-	rc, err := os.Open("./test.png")
-	if err != nil {
-		panic(err)
-	}
-	defer rc.Close()
-
-	m, _, err := image.Decode(rc)
-	if err != nil {
-		panic(err)
-	}
-
-	d, err := monochromeoled.Open(&i2c.Devfs{Dev: "/dev/i2c-1"})
-	if err != nil {
-		panic(err)
-	}
-	defer d.Close()
-
-	// clear the display before putting on anything
-	if err := d.Clear(); err != nil {
-		panic(err)
-	}
-	if err := d.SetImage(0, 0, m); err != nil {
-		panic(err)
-	}
-	if err := d.Draw(); err != nil {
-		panic(err)
-	}
 }

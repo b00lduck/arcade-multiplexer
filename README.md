@@ -1,8 +1,9 @@
 # arcade-multiplexer
 
+## RPi configuration
+
 ```
-# /etc/modules-load.d/
-raspberrypi.conf
+# /etc/modules-load.d/raspberrypi.conf
 
 snd-bcm2835
 dwc2
@@ -27,5 +28,7 @@ dtparam=i2c_arm=on
 
 ```
 # installed packages
+
 i2c-tools
+
 ```
