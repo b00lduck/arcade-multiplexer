@@ -1,31 +1,35 @@
 package rotary
 
 import (
-	"fmt"
-
+	"github.com/b00lduck/arcade-multiplexer/internal/tools"
 	"github.com/warthog618/gpio"
 )
 
 type rotary struct {
-	clk *gpio.Pin
-	dt  *gpio.Pin
-	btn *gpio.Pin
+	clkPin         *gpio.Pin
+	btnPin         *gpio.Pin
+	dtPin          *gpio.Pin
+	upCallback     func()
+	downCallback   func()
+	chooseCallback func()
 }
 
-func NewRotary(clkPin, dtPin, btnPin uint8) *rotary {
+func NewRotary(clkPinNo, dtPinNo, btnPinNo uint8, up, down, choose func()) *rotary {
 
-	dt := gpio.NewPin(dtPin)
-	dt.Input()
-	dt.PullUp()
+	tools.Unexport(dtPinNo)
+	dtPin := gpio.NewPin(dtPinNo)
+	dtPin.Input()
+	dtPin.PullUp()
 
-	clk := gpio.NewPin(clkPin)
-	clk.Input()
-	clk.PullUp()
-	err := clk.Watch(gpio.EdgeFalling, func(pin *gpio.Pin) {
-		if dt.Read() == gpio.Low {
-			fmt.Println("down")
+	tools.Unexport(clkPinNo)
+	clkPin := gpio.NewPin(clkPinNo)
+	clkPin.Input()
+	clkPin.PullUp()
+	err := clkPin.Watch(gpio.EdgeFalling, func(pin *gpio.Pin) {
+		if dtPin.Read() == gpio.Low {
+			down()
 		} else {
-			fmt.Println("up")
+			up()
 		}
 
 	})
@@ -33,25 +37,29 @@ func NewRotary(clkPin, dtPin, btnPin uint8) *rotary {
 		panic(err)
 	}
 
-	btn := gpio.NewPin(btnPin)
-	btn.Input()
-	btn.PullUp()
-	err = btn.Watch(gpio.EdgeFalling, func(pin *gpio.Pin) {
-		fmt.Println("choose")
+	tools.Unexport(btnPinNo)
+	btnPin := gpio.NewPin(btnPinNo)
+	btnPin.Input()
+	btnPin.PullUp()
+	err = btnPin.Watch(gpio.EdgeFalling, func(pin *gpio.Pin) {
+		choose()
 	})
 	if err != nil {
 		panic(err)
 	}
 
 	return &rotary{
-		dt:  dt,
-		clk: clk,
-		btn: btn}
+		clkPin:         clkPin,
+		dtPin:          dtPin,
+		btnPin:         btnPin,
+		upCallback:     up,
+		downCallback:   down,
+		chooseCallback: choose}
 
 }
 
 func (r *rotary) Close() {
-	r.btn.Unwatch()
-	r.dt.Unwatch()
-	r.clk.Unwatch()
+	r.btnPin.Unwatch()
+	r.dtPin.Unwatch()
+	r.clkPin.Unwatch()
 }
