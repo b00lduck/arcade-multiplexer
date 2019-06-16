@@ -29,7 +29,7 @@ func main() {
 	time.Sleep(1 * time.Second)
 	hc595.SendByte(0)
 
-	rotary := rotary.NewRotary(5, 6, 13)
+	rotary := rotary.NewRotary(5, 6, 19)
 	defer rotary.Close()
 
 	oled := oled.NewOled("/dev/i2c-1")
