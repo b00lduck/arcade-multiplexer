@@ -9,6 +9,7 @@ import (
 	"github.com/b00lduck/arcade-multiplexer/internal/oled"
 	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/b00lduck/arcade-multiplexer/internal/state"
+	"github.com/b00lduck/arcade-multiplexer/internal/ui"
 	"github.com/warthog618/gpio"
 )
 
@@ -30,15 +31,15 @@ func main() {
 	time.Sleep(1 * time.Second)
 	hc595.SendByte(0)
 
-	state := state.NewState()
-
-	rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
-	defer rotary.Close()
-
 	oled := oled.NewOled("/dev/i2c-1")
 	defer oled.Close()
 
-	oled.ShowImage("./test.png")
+	ui := ui.NewUi(oled)
+
+	state := state.NewState(ui)
+
+	rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
+	defer rotary.Close()
 
 	select {
 	case <-time.After(time.Minute):

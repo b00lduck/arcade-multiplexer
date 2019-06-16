@@ -10,4 +10,5 @@ require (
 	github.com/stianeikeland/go-rpio/v4 v4.4.0
 	github.com/warthog618/gpio v0.3.0
 	golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522
+	golang.org/x/image v0.0.0-20190227222117-0694c2d4d067
 )

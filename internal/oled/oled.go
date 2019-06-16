@@ -30,7 +30,7 @@ func (o *oled) Close() {
 	o.fs.Close()
 }
 
-func (o *oled) ShowImage(filename string) error {
+func (o *oled) ShowImageFromFile(filename string) error {
 	rc, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -42,10 +42,14 @@ func (o *oled) ShowImage(filename string) error {
 		return err
 	}
 
+	return o.ShowImage(m)
+}
+
+func (o *oled) ShowImage(i image.Image) error {
 	if err := o.fs.Clear(); err != nil {
 		return err
 	}
-	if err := o.fs.SetImage(0, 0, m); err != nil {
+	if err := o.fs.SetImage(0, 0, i); err != nil {
 		return err
 	}
 	if err := o.fs.Draw(); err != nil {
