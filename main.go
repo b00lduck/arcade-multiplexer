@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
+	"github.com/b00lduck/arcade-multiplexer/internal/matrix"
 	"github.com/b00lduck/arcade-multiplexer/internal/oled"
 	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/b00lduck/arcade-multiplexer/internal/state"
@@ -40,6 +41,9 @@ func main() {
 
 	rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
 	defer rotary.Close()
+
+	matrix := matrix.NewMatrix([]uint8{23, 24, 25, 26}, []uint8{14, 15, 18})
+	go matrix.Run()
 
 	select {
 	case <-time.After(time.Minute):
