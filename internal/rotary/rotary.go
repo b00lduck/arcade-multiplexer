@@ -12,6 +12,7 @@ type rotary struct {
 	upCallback     func()
 	downCallback   func()
 	chooseCallback func()
+	isFirst        bool
 }
 
 func NewRotary(clkPinNo, dtPinNo, btnPinNo uint8, up, down, choose func()) *rotary {
@@ -37,24 +38,30 @@ func NewRotary(clkPinNo, dtPinNo, btnPinNo uint8, up, down, choose func()) *rota
 		panic(err)
 	}
 
+	ret := &rotary{
+		clkPin:         clkPin,
+		dtPin:          dtPin,
+		upCallback:     up,
+		downCallback:   down,
+		chooseCallback: choose,
+		isFirst:        true}
+
 	tools.Unexport(btnPinNo)
 	btnPin := gpio.NewPin(btnPinNo)
 	btnPin.Input()
 	btnPin.PullUp()
 	err = btnPin.Watch(gpio.EdgeFalling, func(pin *gpio.Pin) {
-		choose()
+		if !ret.isFirst {
+			choose()
+		}
+		ret.isFirst = false
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	return &rotary{
-		clkPin:         clkPin,
-		dtPin:          dtPin,
-		btnPin:         btnPin,
-		upCallback:     up,
-		downCallback:   down,
-		chooseCallback: choose}
+	ret.btnPin = btnPin
+	return ret
 
 }
 
