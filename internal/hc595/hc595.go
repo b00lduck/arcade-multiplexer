@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/b00lduck/arcade-multiplexer/internal/data"
 	"github.com/warthog618/gpio"
 )
 
@@ -11,6 +12,7 @@ type hc595 struct {
 	data  *gpio.Pin
 	clk   *gpio.Pin
 	latch *gpio.Pin
+	State uint32
 }
 
 func NewHc595(dataPin, clkPin, latchPin uint8) *hc595 {
@@ -37,12 +39,10 @@ func NewHc595(dataPin, clkPin, latchPin uint8) *hc595 {
 
 }
 
-func (o *hc595) SendByte(b uint16) {
+func (o *hc595) SendWord(b uint32) {
 
-	var x uint16 = 1
-	for i := 0; i < 16; i++ {
-
-		fmt.Printf("%d\n", b&x)
+	var x uint32 = 1
+	for i := 0; i < 24; i++ {
 
 		if b&x > 0 {
 			o.data.High()
@@ -60,5 +60,54 @@ func (o *hc595) SendByte(b uint16) {
 	o.latch.High()
 	time.Sleep(1 * time.Microsecond)
 	o.latch.Low()
+
+	o.State = b
+
+	fmt.Printf("%x\n", o.State)
+
+}
+
+func SetJoystick(oldState uint32, index uint8, data *data.Joystick) uint32 {
+
+	var value uint32
+	if data.Up {
+		value += 16
+	}
+	if data.Down {
+		value += 8
+	}
+	if data.Left {
+		value += 4
+	}
+	if data.Right {
+		value += 2
+	}
+
+	switch index {
+	case 0:
+		return (oldState | 0x1e) - value
+	case 1:
+		return (oldState | 0x3c0) - value<<5
+	}
+
+	return oldState
+
+}
+
+func SetButton(oldState uint32, index uint8, button bool) uint32 {
+
+	var value uint32
+	if !button {
+		value = 1
+	}
+
+	switch index {
+	case 0:
+		return oldState&0xfffffffe | value
+	case 1:
+		return oldState&0xffffffdf | value<<5
+	}
+
+	return oldState
 
 }
