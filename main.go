@@ -10,10 +10,6 @@ import (
 	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
 	hc595p "github.com/b00lduck/arcade-multiplexer/internal/hc595"
 	"github.com/b00lduck/arcade-multiplexer/internal/matrix"
-	"github.com/b00lduck/arcade-multiplexer/internal/oled"
-	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
-	"github.com/b00lduck/arcade-multiplexer/internal/state"
-	"github.com/b00lduck/arcade-multiplexer/internal/ui"
 	"github.com/warthog618/gpio"
 )
 
@@ -36,17 +32,17 @@ func main() {
 	time.Sleep(1 * time.Second)
 	hc595.SendWord(0x000003ff)
 
-	oled := oled.NewOled("/dev/i2c-1")
-	defer oled.Close()
+	//oled := oled.NewOled("/dev/i2c-1")
+	//defer oled.Close()
 
-	ui := ui.NewUi(oled)
+	//ui := ui.NewUi(oled)
 
-	state := state.NewState(ui)
+	//state := state.NewState(ui)
 
-	rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
-	defer rotary.Close()
+	//rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
+	//defer rotary.Close()
 
-	matrix := matrix.NewMatrix([]uint8{23, 24, 25, 26}, []uint8{14, 15, 18, 12, 16})
+	matrix := matrix.NewMatrix([]uint8{5, 6, 13, 19}, []uint8{14, 15, 18, 12, 16})
 	go matrix.Run(func(ms *data.MatrixState) {
 		fmt.Println("Jostick 1: ", ms.Player1Joystick.String())
 		fmt.Println("Jostick 2: ", ms.Player2Joystick.String())
