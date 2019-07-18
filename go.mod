@@ -3,10 +3,11 @@ module github.com/b00lduck/arcade-multiplexer
 go 1.12
 
 require (
+	github.com/b00lduck/raspberry-datalogger-display v0.0.0-20190606203944-46214c365eee
 	github.com/goiot/devices v0.0.0-20160708214026-09d1226fc8ea
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/kidoman/embd v0.0.0-20170508013040-d3d8c0c5c68d
-	github.com/sirupsen/logrus v1.0.6
+	github.com/sirupsen/logrus v1.4.2
 	github.com/stianeikeland/go-rpio v4.2.0+incompatible
 	github.com/stianeikeland/go-rpio/v4 v4.4.0
 	github.com/tarent/logrus v0.11.5

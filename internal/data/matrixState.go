@@ -7,3 +7,9 @@ type MatrixState struct {
 	Player2Joystick Joystick
 	GlobalKeypad    GlobalKeypad
 }
+
+type LedState struct {
+	Player1Keypad PlayerKeypad
+	Player2Keypad PlayerKeypad
+	GlobalKeypad  GlobalKeypad
+}

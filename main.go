@@ -2,48 +2,94 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/draw"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 	"os"
 	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
+	"github.com/b00lduck/arcade-multiplexer/internal/aux"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
 	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
-	hc595p "github.com/b00lduck/arcade-multiplexer/internal/hc595"
 	"github.com/b00lduck/arcade-multiplexer/internal/matrix"
+	"github.com/b00lduck/raspberry-datalogger-display/tools"
+	"github.com/tarent/logrus"
 	"github.com/warthog618/gpio"
 )
 
 func main() {
 
-	// capture exit signals to ensure resources are released on exit.
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill)
-	defer signal.Stop(quit)
+	// capture exit signals
+	quit := make(chan os.Signal, 2)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	err := gpio.Open()
 	if err != nil {
-		panic(err)
+		logrus.WithError(err).Fatal("Could not open GPIO")
 	}
 	defer gpio.Close()
 
-	hc595 := hc595.NewHc595(17, 27, 22)
+	fb := framebuffer.NewFramebuffer("/dev/fb1")
+	defer fb.Close()
 
-	hc595.SendWord(0x00ffe3ff)
+	splash := LoadImage("turrican2.jpg")
+	draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
+
+	hc595 := hc595.NewHc595(26, 27, 22)
+
+	aux := aux.NewAux(23, 20)
+	aux.SetPwr(true)
+
+	hc595.SetLeds(data.LedState{
+		Player1Keypad: data.PlayerKeypad{
+			Red:    true,
+			Yellow: true,
+			Green:  true,
+			Blue:   true},
+		Player2Keypad: data.PlayerKeypad{
+			Red:    true,
+			Yellow: true,
+			Green:  true,
+			Blue:   true},
+		GlobalKeypad: data.GlobalKeypad{
+			WhiteLeft:  true,
+			WhiteRight: true}})
+
 	time.Sleep(1 * time.Second)
-	hc595.SendWord(0x000003ff)
 
-	//oled := oled.NewOled("/dev/i2c-1")
-	//defer oled.Close()
+	hc595.SetLeds(data.LedState{
+		Player1Keypad: data.PlayerKeypad{
+			Red:    true,
+			Yellow: false,
+			Green:  false,
+			Blue:   false},
+		Player2Keypad: data.PlayerKeypad{
+			Red:    true,
+			Yellow: false,
+			Green:  false,
+			Blue:   false},
+		GlobalKeypad: data.GlobalKeypad{
+			WhiteLeft:  true,
+			WhiteRight: true}})
 
-	//ui := ui.NewUi(oled)
+	matrix := matrix.NewMatrix(func(row uint8) {
+		hc595.SelectRow(row)
+	}, 4, []uint8{14, 15, 18, 12, 16})
 
-	//state := state.NewState(ui)
+	go func() {
+		<-quit
+		logrus.Info("Shuttong down")
+		aux.SetPwr(false)
+		os.Exit(0)
+	}()
 
-	//rotary := rotary.NewRotary(5, 6, 19, state.Up, state.Down, state.Choose)
-	//defer rotary.Close()
-
-	matrix := matrix.NewMatrix([]uint8{5, 6, 13, 19}, []uint8{14, 15, 18, 12, 16})
-	go matrix.Run(func(ms *data.MatrixState) {
+	matrix.Run(func(ms *data.MatrixState) {
 		fmt.Println("Jostick 1: ", ms.Player1Joystick.String())
 		fmt.Println("Jostick 2: ", ms.Player2Joystick.String())
 		fmt.Println("Keypad 1:  ", ms.Player1Keypad.String())
@@ -52,19 +98,31 @@ func main() {
 
 		// TODO: transform input matrix
 
-		state := hc595.State
-		state = hc595p.SetJoystick(state, 0, &ms.Player1Joystick)
-		state = hc595p.SetJoystick(state, 1, &ms.Player2Joystick)
-		state = hc595p.SetButton(state, 0, ms.Player1Keypad.Red)
-		state = hc595p.SetButton(state, 1, ms.Player2Keypad.Red)
-		hc595.SendWord(state)
+		hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick, ms.Player1Keypad.Red, ms.Player2Keypad.Red)
 
-		fmt.Printf("\033[6A")
+		fmt.Printf("\033[5A")
 	})
 
-	select {
-	case <-time.After(5 * time.Hour):
-	case <-quit:
+}
+
+func LoadImage(filename string) image.Image {
+
+	f, err := os.Open("images/" + filename)
+	tools.ErrorCheck(err)
+
+	var img image.Image
+
+	lowerFilename := strings.ToLower(filename)
+	switch {
+	case strings.HasSuffix(lowerFilename, ".jpg"):
+		img, err = jpeg.Decode(f)
+	case strings.HasSuffix(lowerFilename, ".png"):
+		img, err = png.Decode(f)
+	case strings.HasSuffix(lowerFilename, ".gif"):
+		img, err = gif.Decode(f)
 	}
 
+	tools.ErrorCheck(err)
+
+	return img
 }

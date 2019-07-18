@@ -8,52 +8,34 @@ import (
 )
 
 type matrix struct {
-	cols        []*gpio.Pin
-	rows        []*gpio.Pin
-	state       [][]bool
-	MatrixState *data.MatrixState
+	cols          []*gpio.Pin
+	numRows       uint8
+	state         [][]bool
+	MatrixState   *data.MatrixState
+	selectRowFunc func(uint8)
 }
 
-/*
-		Byte   1-(MSB)--------  2--------------  3--------------  4-(LSB)--------
-		Bit    7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0
+func NewMatrix(selectRowFunc func(uint8), numRows uint8, colPins []uint8) *matrix {
 
-		Usage  unused  		    HC595 A	         HC595 B          HC595 C
-		       . . . . . . . .  L L L L L L L L  L L L . . . B B  B B B A A A A A
-
-	L = LED via ULN2003
-	A = Atari Joystick Port A
-	B = Atari Joystick Port B
-
-*/
-
-func NewMatrix(rowPins []uint8, colPins []uint8) *matrix {
-
-	rows := make([]*gpio.Pin, len(rowPins))
 	cols := make([]*gpio.Pin, len(colPins))
 
 	state := make([][]bool, len(colPins))
 	for i := range state {
-		state[i] = make([]bool, len(rowPins))
-	}
-
-	for r := 0; r < len(rowPins); r++ {
-		rows[r] = gpio.NewPin(rowPins[r])
-		rows[r].Input()
-		rows[r].PullDown()
+		state[i] = make([]bool, numRows)
 	}
 
 	for c := 0; c < len(colPins); c++ {
 		cols[c] = gpio.NewPin(colPins[c])
-		cols[c].Output()
-		cols[c].Low()
+		cols[c].Input()
+		cols[c].PullUp()
 	}
 
 	return &matrix{
-		rows:        rows,
-		cols:        cols,
-		state:       state,
-		MatrixState: &data.MatrixState{}}
+		numRows:       numRows,
+		cols:          cols,
+		state:         state,
+		selectRowFunc: selectRowFunc,
+		MatrixState:   &data.MatrixState{}}
 
 }
 
@@ -63,21 +45,24 @@ func (m *matrix) Run(changedCallback func(*data.MatrixState)) {
 
 		changed := false
 
-		for colKey, col := range m.cols {
-			col.High()
+		for row := uint8(0); row < m.numRows; row++ {
+			m.selectRowFunc(row)
 			time.Sleep(1 * time.Microsecond)
-
-			for rowKey, row := range m.rows {
-				oldValue := m.state[colKey][rowKey]
-				m.state[colKey][rowKey] = row.Read() == gpio.High
-				if m.state[colKey][rowKey] != oldValue {
+			for colKey, col := range m.cols {
+				oldValue := m.state[colKey][row]
+				m.state[colKey][row] = col.Read() == gpio.Low
+				if m.state[colKey][row] != oldValue {
 					changed = true
 				}
 			}
-
-			col.Low()
-			time.Sleep(1 * time.Microsecond)
 		}
+
+		// C443FF 1100 0100 0100 0011 1111 1111
+
+		// c447ff 1100 0100 0100 0111 1111 1111
+		// c44bff 1100 0100 0100 1011 1111 1111
+		// C453FF 1100 0100 0101 0011 1111 1111
+		// c463ff 1100 0100 0110 0011 1111 1111
 
 		if changed {
 			for colKey := range m.cols {
