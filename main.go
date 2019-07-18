@@ -18,6 +18,7 @@ import (
 	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
 	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
 	"github.com/b00lduck/arcade-multiplexer/internal/matrix"
+	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/b00lduck/raspberry-datalogger-display/tools"
 	"github.com/tarent/logrus"
 	"github.com/warthog618/gpio"
@@ -87,6 +88,22 @@ func main() {
 		logrus.Info("Shuttong down")
 		aux.SetPwr(false)
 		os.Exit(0)
+	}()
+
+	rotary := rotary.NewRotary(0, 1, 21)
+	go rotary.Run()
+
+	posi := 0
+
+	go func() {
+		for {
+			d := rotary.Delta()
+			if d != 0 {
+				posi -= d
+				logrus.Info(posi / 4)
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
 	}()
 
 	matrix.Run(func(ms *data.MatrixState) {

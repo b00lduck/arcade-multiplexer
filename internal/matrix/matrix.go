@@ -57,13 +57,6 @@ func (m *matrix) Run(changedCallback func(*data.MatrixState)) {
 			}
 		}
 
-		// C443FF 1100 0100 0100 0011 1111 1111
-
-		// c447ff 1100 0100 0100 0111 1111 1111
-		// c44bff 1100 0100 0100 1011 1111 1111
-		// C453FF 1100 0100 0101 0011 1111 1111
-		// c463ff 1100 0100 0110 0011 1111 1111
-
 		if changed {
 			for colKey := range m.cols {
 
