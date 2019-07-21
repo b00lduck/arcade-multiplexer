@@ -115,7 +115,9 @@ func main() {
 
 		// TODO: transform input matrix
 
-		hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick, ms.Player1Keypad.Red, ms.Player2Keypad.Red)
+		hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick,
+			ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
+			ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
 
 		fmt.Printf("\033[5A")
 	})

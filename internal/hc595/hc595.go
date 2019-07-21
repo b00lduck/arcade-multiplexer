@@ -18,15 +18,15 @@ type hc595 struct {
 
 /*
 		Byte   1-(MSB)--------  2--------------  3--------------  4-(LSB)--------
-		Bit    7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  Q+
+		Bit    7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0  7 6 5 4 3 2 1 0
 
 		Usage  unused  		    HC595 A	         HC595 B          HC595 C
-		       . . . . . . . .  R L L L L L L L  L L L M M M M B  B B B B A A A A  A
+		       L L L L L L L L  L L M M M M . .  B B B B B B . .  A A A A A A . .
+
 
 	L = LED via ULN2003
 	A = Atari Joystick Port A
 	B = Atari Joystick Port B
-	R = MiST reset
 
 */
 
@@ -58,7 +58,7 @@ func NewHc595(dataPin, clkPin, latchPin uint8) *hc595 {
 func (o *hc595) sendWord(b uint32) {
 
 	var x uint32 = 1
-	for i := 0; i < 24; i++ {
+	for i := 0; i < 32; i++ {
 
 		if b&x > 0 {
 			o.data.High()
@@ -82,19 +82,17 @@ func (o *hc595) sendWord(b uint32) {
 
 func (o *hc595) SelectRow(b uint8) {
 	o.mutex.Lock()
-	var value uint32 = (0xf - 1<<b) << 10
+	var value uint32 = (0xf - 1<<b) << 18
 
-	o.sendWord(o.state&0xFFFFC3FF | value)
+	o.sendWord(o.state&0xFFC3FFFF | value)
 	o.mutex.Unlock()
 }
 
-func (o *hc595) SetJoys(joy1, joy2 *data.Joystick, butt1, butt2 bool) {
+func (o *hc595) SetJoys(joy1, joy2 *data.Joystick, butt1a, butt1b, butt2a, butt2b bool) {
 	o.mutex.Lock()
 	state := o.state
-	state = setJoystick(state, 0, joy1)
-	state = setJoystick(state, 1, joy2)
-	state = setButton(state, 0, butt1)
-	state = setButton(state, 1, butt2)
+	state = setJoystick(state, 0, joy1, butt1a, butt1b)
+	state = setJoystick(state, 1, joy2, butt2a, butt2b)
 	o.sendWord(state)
 	o.mutex.Unlock()
 }
@@ -102,62 +100,50 @@ func (o *hc595) SetJoys(joy1, joy2 *data.Joystick, butt1, butt2 bool) {
 func (o *hc595) SetLeds(leds data.LedState) {
 	o.mutex.Lock()
 	ledState := 0
+
 	ledState += B2i(leds.Player1Keypad.Red, 0)
 	ledState += B2i(leds.Player1Keypad.Yellow, 1)
 	ledState += B2i(leds.Player1Keypad.Blue, 2)
 	ledState += B2i(leds.Player1Keypad.Green, 3)
+	ledState += B2i(leds.GlobalKeypad.WhiteLeft, 4)
 
-	ledState += B2i(leds.Player2Keypad.Red, 4)
-	ledState += B2i(leds.Player2Keypad.Yellow, 5)
-	ledState += B2i(leds.Player2Keypad.Blue, 6)
-	ledState += B2i(leds.Player2Keypad.Green, 7)
-
-	ledState += B2i(leds.GlobalKeypad.WhiteLeft, 8)
+	ledState += B2i(leds.Player2Keypad.Red, 5)
+	ledState += B2i(leds.Player2Keypad.Yellow, 6)
+	ledState += B2i(leds.Player2Keypad.Blue, 7)
+	ledState += B2i(leds.Player2Keypad.Green, 8)
 	ledState += B2i(leds.GlobalKeypad.WhiteRight, 9)
 
-	o.sendWord(o.state&0xFF001FFF | (uint32(ledState))<<14)
+	o.sendWord(o.state&0x001FFFFF | (uint32(ledState))<<22)
 	o.mutex.Unlock()
 }
 
-func setJoystick(oldState uint32, index uint8, data *data.Joystick) uint32 {
+func setJoystick(oldState uint32, index uint8, data *data.Joystick, button1, button2 bool) uint32 {
 
-	var value uint32
+	var value = uint32(0xff)
 	if data.Up {
-		value += 16
+		value -= 128
 	}
 	if data.Down {
-		value += 8
+		value -= 64
 	}
 	if data.Left {
-		value += 4
+		value -= 32
 	}
 	if data.Right {
-		value += 2
+		value -= 16
+	}
+	if button1 {
+		value -= 8
+	}
+	if button2 {
+		value -= 4
 	}
 
 	switch index {
 	case 0:
-		return (oldState | 0x1e) - value
+		return oldState&0xFFFFFF03 | (uint32(value))<<0
 	case 1:
-		return (oldState | 0x3c0) - value<<5
-	}
-
-	return oldState
-
-}
-
-func setButton(oldState uint32, index uint8, button bool) uint32 {
-
-	var value uint32
-	if !button {
-		value = 1
-	}
-
-	switch index {
-	case 0:
-		return oldState&0xfffffffe | value
-	case 1:
-		return oldState&0xffffffdf | value<<5
+		return oldState&0xFFFF03FF | (uint32(value))<<8
 	}
 
 	return oldState
