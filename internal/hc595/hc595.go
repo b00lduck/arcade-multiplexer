@@ -119,7 +119,7 @@ func (o *hc595) SetLeds(leds data.LedState) {
 
 func setJoystick(oldState uint32, index uint8, data *data.Joystick, button1, button2 bool) uint32 {
 
-	var value = uint32(0xff)
+	var value = uint32(0xfc)
 	if data.Up {
 		value -= 128
 	}
