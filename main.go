@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/draw"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -13,15 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/aux"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
-	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
-	"github.com/b00lduck/arcade-multiplexer/internal/hc595"
-	"github.com/b00lduck/arcade-multiplexer/internal/matrix"
-	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
-	"github.com/b00lduck/raspberry-datalogger-display/tools"
+	"github.com/b00lduck/arcade-multiplexer/internal/pcf8574"
 	"github.com/tarent/logrus"
-	"github.com/warthog618/gpio"
 )
 
 func main() {
@@ -30,7 +23,27 @@ func main() {
 	quit := make(chan os.Signal, 2)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	err := gpio.Open()
+	go func() {
+		<-quit
+		logrus.Info("Shutting down")
+		//aux.SetPwr(false)
+		os.Exit(0)
+	}()
+
+	mpx := pcf8574.NewPcf8574()
+	go mpx.Run(func(ms data.MatrixState) {
+		fmt.Println(ms.String())
+
+		// TODO: transform input matrix
+
+		//hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick,
+		//	ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
+		//	ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
+
+		fmt.Printf("\033[7A")
+	})
+
+	/*err := gpio.Open()
 	if err != nil {
 		logrus.WithError(err).Fatal("Could not open GPIO")
 	}
@@ -42,92 +55,84 @@ func main() {
 	splash := LoadImage("turrican2.jpg")
 	draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
 
-	hc595 := hc595.NewHc595(26, 27, 22)
-
 	aux := aux.NewAux(23, 20)
 	aux.SetPwr(true)
+	*/
 
-	hc595.SetLeds(data.LedState{
-		Player1Keypad: data.PlayerKeypad{
-			Red:    true,
-			Yellow: true,
-			Green:  true,
-			Blue:   true},
-		Player2Keypad: data.PlayerKeypad{
-			Red:    true,
-			Yellow: true,
-			Green:  true,
-			Blue:   true},
-		GlobalKeypad: data.GlobalKeypad{
-			WhiteLeft:  true,
-			WhiteRight: true}})
+	for {
+		mpx.SetLeds(data.LedState{
+			Player1Keypad: data.PlayerKeypad{
+				Red:    true,
+				Yellow: true,
+				Green:  true,
+				Blue:   true},
+			Player2Keypad: data.PlayerKeypad{
+				Red:    true,
+				Yellow: true,
+				Green:  true,
+				Blue:   true},
+			GlobalKeypad: data.GlobalKeypad{
+				WhiteLeft:  true,
+				WhiteRight: true}})
 
-	time.Sleep(1 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 
-	hc595.SetLeds(data.LedState{
-		Player1Keypad: data.PlayerKeypad{
-			Red:    true,
-			Yellow: false,
-			Green:  false,
-			Blue:   false},
-		Player2Keypad: data.PlayerKeypad{
-			Red:    true,
-			Yellow: false,
-			Green:  false,
-			Blue:   false},
-		GlobalKeypad: data.GlobalKeypad{
-			WhiteLeft:  true,
-			WhiteRight: true}})
+		mpx.SetLeds(data.LedState{
+			Player1Keypad: data.PlayerKeypad{
+				Red:    true,
+				Yellow: false,
+				Green:  false,
+				Blue:   false},
+			Player2Keypad: data.PlayerKeypad{
+				Red:    true,
+				Yellow: false,
+				Green:  false,
+				Blue:   false},
+			GlobalKeypad: data.GlobalKeypad{
+				WhiteLeft:  true,
+				WhiteRight: true}})
 
-	matrix := matrix.NewMatrix(func(row uint8) {
-		hc595.SelectRow(row)
-	}, 4, []uint8{14, 15, 18, 12, 16})
+		time.Sleep(20 * time.Millisecond)
+	}
+	/*
+		matrix := matrix.NewMatrix(func(row uint8) {
+			hc595.SelectRow(row)
+		}, 4, []uint8{14, 15, 18, 12, 16})
 
-	go func() {
-		<-quit
-		logrus.Info("Shuttong down")
-		aux.SetPwr(false)
-		os.Exit(0)
-	}()
+	*/
 
-	rotary := rotary.NewRotary(0, 1, 21)
-	go rotary.Run()
+	/*
 
-	posi := 0
+		rotary := rotary.NewRotary(0, 1, 21)
+		go rotary.Run()
 
-	go func() {
-		for {
-			d := rotary.Delta()
-			if d != 0 {
-				posi -= d
-				logrus.Info(posi / 4)
+		posi := 0
+
+		go func() {
+			for {
+				d := rotary.Delta()
+				if d != 0 {
+					posi -= d
+					logrus.Info(posi / 4)
+				}
+				time.Sleep(100 * time.Millisecond)
 			}
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
+		}()
 
-	matrix.Run(func(ms *data.MatrixState) {
-		fmt.Println("Jostick 1: ", ms.Player1Joystick.String())
-		fmt.Println("Jostick 2: ", ms.Player2Joystick.String())
-		fmt.Println("Keypad 1:  ", ms.Player1Keypad.String())
-		fmt.Println("Keypad 2:  ", ms.Player2Keypad.String())
-		fmt.Println("Global:    ", ms.GlobalKeypad.String())
+	*/
 
-		// TODO: transform input matrix
+	for {
 
-		hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick,
-			ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
-			ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
-
-		fmt.Printf("\033[5A")
-	})
+	}
 
 }
 
 func LoadImage(filename string) image.Image {
 
 	f, err := os.Open("images/" + filename)
-	tools.ErrorCheck(err)
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not load image")
+	}
 
 	var img image.Image
 
@@ -141,7 +146,9 @@ func LoadImage(filename string) image.Image {
 		img, err = gif.Decode(f)
 	}
 
-	tools.ErrorCheck(err)
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not decode image")
+	}
 
 	return img
 }

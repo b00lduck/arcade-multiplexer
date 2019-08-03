@@ -11,4 +11,4 @@ set -e
 scp arcade-multiplexer root@arcade:/root/
 #scp test.png root@arcade:/root/
 
-ssh root@arcade "/root/arcade-multiplexer"
+ssh -t root@arcade "/root/arcade-multiplexer"

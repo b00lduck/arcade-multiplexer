@@ -7,6 +7,13 @@ type GlobalKeypad struct {
 	FlipperRight bool
 }
 
+func (k *GlobalKeypad) Changed(old GlobalKeypad) bool {
+	return old.WhiteLeft != k.WhiteLeft ||
+		old.WhiteRight != k.WhiteRight ||
+		old.FlipperLeft != k.FlipperLeft ||
+		old.FlipperRight != k.FlipperRight
+}
+
 func (k *GlobalKeypad) String() string {
 	ret := ""
 	if k.WhiteLeft {

@@ -7,6 +7,13 @@ type Joystick struct {
 	Right bool
 }
 
+func (k *Joystick) Changed(old Joystick) bool {
+	return old.Up != k.Up ||
+		old.Down != k.Down ||
+		old.Left != k.Left ||
+		old.Right != k.Right
+}
+
 func (k *Joystick) String() string {
 	ret := ""
 	if k.Up {

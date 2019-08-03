@@ -31,3 +31,10 @@ func (k *PlayerKeypad) String() string {
 	}
 	return ret
 }
+
+func (k *PlayerKeypad) Changed(old PlayerKeypad) bool {
+	return old.Red != k.Red ||
+		old.Yellow != k.Yellow ||
+		old.Green != k.Green ||
+		old.Blue != k.Blue
+}
