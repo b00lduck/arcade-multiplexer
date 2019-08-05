@@ -75,7 +75,7 @@ func main() {
 				WhiteLeft:  true,
 				WhiteRight: true}})
 
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 
 		mpx.SetLeds(data.LedState{
 			Player1Keypad: data.PlayerKeypad{
@@ -89,19 +89,15 @@ func main() {
 				Green:  false,
 				Blue:   false},
 			GlobalKeypad: data.GlobalKeypad{
-				WhiteLeft:  true,
-				WhiteRight: true}})
+				WhiteLeft:  false,
+				WhiteRight: false}})
 
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 	/*
 		matrix := matrix.NewMatrix(func(row uint8) {
 			hc595.SelectRow(row)
 		}, 4, []uint8{14, 15, 18, 12, 16})
-
-	*/
-
-	/*
 
 		rotary := rotary.NewRotary(0, 1, 21)
 		go rotary.Run()
@@ -120,10 +116,6 @@ func main() {
 		}()
 
 	*/
-
-	for {
-
-	}
 
 }
 
