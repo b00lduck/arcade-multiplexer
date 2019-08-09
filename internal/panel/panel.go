@@ -1,21 +1,16 @@
-package pcf8574
+package panel
 
 import (
-	"sync"
 	"time"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
-	"github.com/tarent/logrus"
 
 	"github.com/jinzhu/copier"
 	"periph.io/x/periph/conn/i2c"
-	"periph.io/x/periph/conn/i2c/i2creg"
-	"periph.io/x/periph/host"
 )
 
-type pcf8574 struct {
+type panel struct {
 	state         uint32
-	mutex         *sync.Mutex
 	chips         []i2c.Dev
 	writtenStates []uint8
 	readStates    []uint8
@@ -65,18 +60,7 @@ type pcf8574 struct {
 
 const NUM_ROWS = 4
 
-func NewPcf8574() *pcf8574 {
-
-	_, err := host.Init()
-	if err != nil {
-		logrus.WithError(err).Fatal("Could not open initialize periph.io")
-	}
-
-	// Open the first available I²C bus
-	bus, err := i2creg.Open("")
-	if err != nil {
-		logrus.WithError(err).Fatal("Could not open i2c bus")
-	}
+func NewPanel(bus i2c.Bus) *panel {
 
 	// Address the devices on the I²C bus
 	chip0 := i2c.Dev{Bus: bus, Addr: 0x20}
@@ -87,20 +71,16 @@ func NewPcf8574() *pcf8574 {
 	chip1.Write([]byte{0xff})
 	chip2.Write([]byte{0xff})
 
-	return &pcf8574{
+	return &panel{
 		chips:         []i2c.Dev{chip0, chip1, chip2},
 		writtenStates: []uint8{0xff, 0xff, 0xff},
-		readStates:    []uint8{0xff, 0xff, 0xff},
-		mutex:         &sync.Mutex{}}
+		readStates:    []uint8{0xff, 0xff, 0xff}}
 
 }
 
-func (o *pcf8574) Run(changeEvent func(data.MatrixState)) {
+func (o *panel) Run(changeEvent func(data.MatrixState)) {
 
 	for {
-
-		o.mutex.Lock()
-
 		o.selectNextRow()
 
 		//logrus.Info(fmt.Sprintf("%08b %08b %08b", o.writtenStates[0], o.writtenStates[1], o.writtenStates[2]))
@@ -119,15 +99,13 @@ func (o *pcf8574) Run(changeEvent func(data.MatrixState)) {
 			changeEvent(o.matrixState)
 		}
 
-		o.mutex.Unlock()
-
 		time.Sleep(1000 * time.Microsecond)
 
 	}
 
 }
 
-func (o *pcf8574) decodeMatrix() data.MatrixState {
+func (o *panel) decodeMatrix() data.MatrixState {
 
 	var newMatrix data.MatrixState
 	copier.Copy(&newMatrix, &o.matrixState)
@@ -171,7 +149,7 @@ func (o *pcf8574) decodeMatrix() data.MatrixState {
 	return newMatrix
 }
 
-func (o *pcf8574) selectNextRow() {
+func (o *panel) selectNextRow() {
 
 	for i := uint8(0); i < NUM_ROWS; i++ {
 		state := i != o.selectedRow
@@ -186,9 +164,7 @@ func (o *pcf8574) selectNextRow() {
 
 }
 
-func (o *pcf8574) SetLeds(leds data.LedState) {
-	o.mutex.Lock()
-
+func (o *panel) SetLeds(leds data.LedState) {
 	o.changeChipBit(0, 0, leds.Player1Keypad.Red)
 	o.changeChipBit(0, 1, leds.Player1Keypad.Yellow)
 	o.changeChipBit(0, 2, leds.Player1Keypad.Green)
@@ -200,11 +176,9 @@ func (o *pcf8574) SetLeds(leds data.LedState) {
 	o.changeChipBit(0, 7, leds.Player1Keypad.Green)
 	o.changeChipBit(1, 0, leds.Player1Keypad.Blue)
 	o.changeChipBit(1, 7, leds.GlobalKeypad.WhiteLeft)
-
-	o.mutex.Unlock()
 }
 
-func (o *pcf8574) changeChipBit(chip uint8, bit uint8, state bool) {
+func (o *panel) changeChipBit(chip uint8, bit uint8, state bool) {
 	o.writtenStates[chip] = changeBit(o.writtenStates[chip], bit, state)
 }
 

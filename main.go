@@ -13,8 +13,11 @@ import (
 	"time"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
-	"github.com/b00lduck/arcade-multiplexer/internal/pcf8574"
+	"github.com/b00lduck/arcade-multiplexer/internal/mist"
+	"github.com/b00lduck/arcade-multiplexer/internal/panel"
 	"github.com/tarent/logrus"
+	"periph.io/x/periph/conn/i2c/i2creg"
+	"periph.io/x/periph/host"
 )
 
 func main() {
@@ -30,13 +33,25 @@ func main() {
 		os.Exit(0)
 	}()
 
-	mpx := pcf8574.NewPcf8574()
-	go mpx.Run(func(ms data.MatrixState) {
+	_, err := host.Init()
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not open initialize periph.io")
+	}
+
+	// Open the first available I²C bus
+	bus, err := i2creg.Open("")
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not open i2c bus")
+	}
+
+	mist := mist.NewMist(bus)
+	go mist.Run()
+
+	panel := panel.NewPanel(bus)
+	go panel.Run(func(ms data.MatrixState) {
 		fmt.Println(ms.String())
 
-		// TODO: transform input matrix
-
-		//hc595.SetJoys(&ms.Player1Joystick, &ms.Player2Joystick,
+		mist.SetJoystick(&ms.Player1Joystick, &ms.Player2Joystick)
 		//	ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
 		//	ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
 
@@ -60,7 +75,7 @@ func main() {
 	*/
 
 	for {
-		mpx.SetLeds(data.LedState{
+		panel.SetLeds(data.LedState{
 			Player1Keypad: data.PlayerKeypad{
 				Red:    true,
 				Yellow: true,
@@ -77,7 +92,7 @@ func main() {
 
 		time.Sleep(500 * time.Millisecond)
 
-		mpx.SetLeds(data.LedState{
+		panel.SetLeds(data.LedState{
 			Player1Keypad: data.PlayerKeypad{
 				Red:    true,
 				Yellow: false,
@@ -95,9 +110,6 @@ func main() {
 		time.Sleep(500 * time.Millisecond)
 	}
 	/*
-		matrix := matrix.NewMatrix(func(row uint8) {
-			hc595.SelectRow(row)
-		}, 4, []uint8{14, 15, 18, 12, 16})
 
 		rotary := rotary.NewRotary(0, 1, 21)
 		go rotary.Run()
