@@ -26,13 +26,8 @@ func main() {
 	quit := make(chan os.Signal, 2)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		<-quit
-		logrus.Info("Shutting down")
-		//aux.SetPwr(false)
-		os.Exit(0)
-	}()
-
+	// Initialize periph.io library
+	// see https://periph.io/project/library/
 	_, err := host.Init()
 	if err != nil {
 		logrus.WithError(err).Fatal("Could not open initialize periph.io")
@@ -44,34 +39,59 @@ func main() {
 		logrus.WithError(err).Fatal("Could not open i2c bus")
 	}
 
+	// Initialize connection to MiST-interface board
 	mist := mist.NewMist(bus)
 	go mist.Run()
 
+	// Initialize connection to panel board
 	panel := panel.NewPanel(bus)
 	go panel.Run(func(ms data.MatrixState) {
 		fmt.Println(ms.String())
 
-		mist.SetJoystick(&ms.Player1Joystick, &ms.Player2Joystick)
-		//	ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
-		//	ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
+		mist.SetJoystick(&ms.Player1Joystick, &ms.Player2Joystick,
+			ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
+			ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
 
 		fmt.Printf("\033[7A")
 	})
 
-	/*err := gpio.Open()
-	if err != nil {
-		logrus.WithError(err).Fatal("Could not open GPIO")
-	}
-	defer gpio.Close()
+	// Exit handler routine, triggered by signal (see above)
+	go func() {
+		<-quit
+		logrus.Info("Shutting down")
+		mist.SetPower(false)
+		// give some time to shut down the power pin via i2c
+		time.Sleep(500 * time.Millisecond)
+		os.Exit(0)
+	}()
 
-	fb := framebuffer.NewFramebuffer("/dev/fb1")
-	defer fb.Close()
+	/*
+		fb := framebuffer.NewFramebuffer("/dev/fb1")
+		defer fb.Close()
 
-	splash := LoadImage("turrican2.jpg")
-	draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
+		splash := LoadImage("turrican2.jpg")
+		draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
+	*/
 
-	aux := aux.NewAux(23, 20)
-	aux.SetPwr(true)
+	mist.SetPower(true)
+
+	/*
+		rotary := rotary.NewRotary(0, 1, 21)
+		go rotary.Run()
+
+		posi := 0
+
+		go func() {
+			for {
+				d := rotary.Delta()
+				if d != 0 {
+					posi -= d
+					logrus.Info(posi / 4)
+				}
+				time.Sleep(100 * time.Millisecond)
+			}
+		}()
+
 	*/
 
 	for {
@@ -109,25 +129,6 @@ func main() {
 
 		time.Sleep(500 * time.Millisecond)
 	}
-	/*
-
-		rotary := rotary.NewRotary(0, 1, 21)
-		go rotary.Run()
-
-		posi := 0
-
-		go func() {
-			for {
-				d := rotary.Delta()
-				if d != 0 {
-					posi -= d
-					logrus.Info(posi / 4)
-				}
-				time.Sleep(100 * time.Millisecond)
-			}
-		}()
-
-	*/
 
 }
 
