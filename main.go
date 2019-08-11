@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/draw"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -13,8 +14,10 @@ import (
 	"time"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
 	"github.com/b00lduck/arcade-multiplexer/internal/mist"
 	"github.com/b00lduck/arcade-multiplexer/internal/panel"
+	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/tarent/logrus"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/host"
@@ -65,34 +68,33 @@ func main() {
 		os.Exit(0)
 	}()
 
-	/*
-		fb := framebuffer.NewFramebuffer("/dev/fb1")
-		defer fb.Close()
+	fb := framebuffer.NewFramebuffer("/dev/fb1")
+	defer fb.Close()
 
-		splash := LoadImage("turrican2.jpg")
-		draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
-	*/
+	splash := LoadImage("turrican2.jpg")
+	draw.Draw(*fb, (*fb).Bounds(), splash, image.ZP, draw.Src)
 
 	mist.SetPower(true)
 
-	/*
-		rotary := rotary.NewRotary(0, 1, 21)
-		go rotary.Run()
+	rotary := rotary.NewRotary(4, 5, 6)
+	go rotary.Run()
 
-		posi := 0
+	posi := 0
 
-		go func() {
-			for {
-				d := rotary.Delta()
-				if d != 0 {
-					posi -= d
-					logrus.Info(posi / 4)
+	go func() {
+		oldPosi := 0
+		for {
+			d := rotary.Delta()
+			if d != 0 {
+				posi -= d
+				if oldPosi != posi/4 {
+					oldPosi = posi / 4
+					logrus.Info(oldPosi)
 				}
-				time.Sleep(100 * time.Millisecond)
 			}
-		}()
-
-	*/
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
 
 	for {
 		panel.SetLeds(data.LedState{

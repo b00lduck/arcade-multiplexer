@@ -1,30 +1,32 @@
 package rotary
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
-	"github.com/warthog618/gpio"
+	"periph.io/x/periph/conn/gpio"
+	"periph.io/x/periph/conn/gpio/gpioreg"
 )
 
 type rotary struct {
-	clk   *gpio.Pin
-	data  *gpio.Pin
-	btn   *gpio.Pin
+	clk   gpio.PinIO
+	data  gpio.PinIO
+	btn   gpio.PinIO
 	delta int
 	mutex *sync.Mutex
 }
 
 func NewRotary(clkPin, dataPin, btnPin uint8) *rotary {
 
-	clk := gpio.NewPin(clkPin)
-	clk.Input()
+	clk := gpioreg.ByName(fmt.Sprintf("%d", clkPin))
+	clk.In(gpio.PullDown, gpio.BothEdges)
 
-	data := gpio.NewPin(dataPin)
-	data.Input()
+	data := gpioreg.ByName(fmt.Sprintf("%d", dataPin))
+	clk.In(gpio.PullDown, gpio.BothEdges)
 
-	btn := gpio.NewPin(btnPin)
-	btn.Input()
+	btn := gpioreg.ByName(fmt.Sprintf("%d", btnPin))
+	clk.In(gpio.PullDown, gpio.BothEdges)
 
 	return &rotary{
 		clk:   clk,

@@ -28,16 +28,11 @@ raspi-config
 # Deprecated/Legacy information
 
 ```
-# /boot/config.txt
-
-disable_splash=1
-dtoverlay=pi3-disable-bt
-dtoverlay=sdtweak,overclock_50=100
-boot_delay=0
-
-gpu_mem=64
-initramfs initramfs-linux.img followkernel
-dtoverlay=dwc2
 dtparam=i2c_arm=on,i2c_arm_baudrate=400000
-dtoverlay=rpi-display,speed=32000000,rotate=270
+dtoverlay=tft35a:rotate=90,speed=62000000
+gpu_mem=16
 ```
+
+# Notes
+https://github.com/goodtft/LCD-show.git 
+scp tft35a-overlay.dtb root@arcade:/boot/overlays/tft35a.dtbo
