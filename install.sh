@@ -6,9 +6,12 @@ GOARCH=arm GOOS=linux go build .
 
 set +e
 ssh root@arcade "killall -q /root/arcade-multiplexer"
-
 set -e
-scp arcade-multiplexer root@arcade:/root/
-#scp test.png root@arcade:/root/
 
-ssh -t root@arcade "/root/arcade-multiplexer"
+ssh root@arcade "mkdir -p /root/arcade-multiplexer/images"
+
+scp -r data/images root@arcade:/root/arcade-multiplexer
+scp arcade-multiplexer root@arcade:/root/arcade-multiplexer
+scp data/config.yml root@arcade:/root/arcade-multiplexer
+
+ssh -t root@arcade "cd /root/arcade-multiplexer && ./arcade-multiplexer"

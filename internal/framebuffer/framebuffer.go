@@ -10,8 +10,8 @@ import (
 	"github.com/tarent/logrus"
 )
 
-const resx = 480
-const resy = 320
+const resx = 320
+const resy = 480
 const depth = 16
 const screensize = resx * resy * depth / 8
 

@@ -1,0 +1,63 @@
+# Mappings
+# 
+# Inputs
+# ------
+# P1_JOY
+# P1_JOY_UP
+# P1_JOY_DOWN
+# P1_JOY_LEFT
+# P1_JOY_RIGHT
+# P1_RED
+# P1_YELLOW
+# P1_GREEN
+# P1_BLUE
+# P1_FLIPPER
+# P2_JOY
+# P2_JOY_UP
+# P2_JOY_DOWN
+# P2_JOY_LEFT
+# P2_JOY_RIGHT
+# P2_RED
+# P2_YELLOW
+# P2_GREEN
+# P2_BLUE
+# P2_FLIPPER
+# WHITE_LEFT
+# WHITE_RIGHT
+#
+#
+# Output
+# ------
+# JOY1_AXES
+# JOY1_UP
+# JOY1_DOWN# P2_JOY
+# JOY1_LEFT
+# JOY1_RIGHT
+# JOY1_BUTTON1
+# JOY1_BUTTON2
+# JOY2_AXES
+# JOY2_UP
+# JOY2_DOWN
+# JOY2_LEFT
+# JOY2_RIGHT
+# JOY2_BUTTON1
+# JOY2_BUTTON2
+# KEY_SPACE
+# KEY_LSHIFT
+# KEY_RSHIFT
+# KEY_1
+# KEY_2
+# KEY_3
+# KEY_4
+
+games:
+  - name: Turrican 2
+    core: Amiga
+    image: turrican2.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P1_GREEN
+        output: KEY_SPACE  

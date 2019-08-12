@@ -7,18 +7,21 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/b00lduck/arcade-multiplexer/internal/config"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
 	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
 	"github.com/b00lduck/arcade-multiplexer/internal/mist"
 	"github.com/b00lduck/arcade-multiplexer/internal/panel"
 	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/tarent/logrus"
+	"gopkg.in/yaml.v2"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/host"
 )
@@ -42,6 +45,19 @@ func main() {
 		logrus.WithError(err).Fatal("Could not open i2c bus")
 	}
 
+	// load config
+	c := config.Config{}
+	yamlFile, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		logrus.WithError(err).Fatal("Error reading yaml file")
+	}
+	err = yaml.Unmarshal(yamlFile, &c)
+	if err != nil {
+		logrus.WithError(err).Fatal("Error parsing yaml file")
+	}
+
+	logrus.Info(c)
+
 	// Initialize connection to MiST-interface board
 	mist := mist.NewMist(bus)
 	go mist.Run()
@@ -62,7 +78,7 @@ func main() {
 	go func() {
 		<-quit
 		logrus.Info("Shutting down")
-		mist.SetPower(false)
+		//mist.SetPower(false)
 		// give some time to shut down the power pin via i2c
 		time.Sleep(500 * time.Millisecond)
 		os.Exit(0)

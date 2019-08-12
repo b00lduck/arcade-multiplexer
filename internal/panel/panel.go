@@ -24,25 +24,25 @@ type panel struct {
 
 	Chip 1
 	------
-	0 O LED P1 red
-	1 O LED P1 yellow
-	2 O LED P1 green
-	3 O LED P1 blue
-	4 O LED P1 select
-	5 O LED P2 red
+	0 O LED white left
+	1 O LED P1 green
+	2 O LED P1 blue
+	3 O LED P1 yellow
+	4 O LED P2 green
+	5 O LED P2 blue
 	6 O LED P2 yellow
-	7 O LED P2 green
+	7 O LED P2 red
 
 	Chip 2
 	------
-	0 O LED P2 blue
+	0 O LED P1 red
 	1
 	2
 	3
 	4 I Column 4
 	5
 	6
-	7 O LED P2 select
+	7 O LED white right
 
 
 	Chip 3
@@ -83,7 +83,6 @@ func (o *panel) Run(changeEvent func(data.MatrixState)) {
 	for {
 		o.selectNextRow()
 
-		//logrus.Info(fmt.Sprintf("%08b %08b %08b", o.writtenStates[0], o.writtenStates[1], o.writtenStates[2]))
 		for k, v := range o.chips {
 			r := []byte{0}
 			v.Tx([]byte{o.writtenStates[k]}, r)
@@ -165,17 +164,19 @@ func (o *panel) selectNextRow() {
 }
 
 func (o *panel) SetLeds(leds data.LedState) {
-	o.changeChipBit(0, 0, leds.Player1Keypad.Red)
-	o.changeChipBit(0, 1, leds.Player1Keypad.Yellow)
-	o.changeChipBit(0, 2, leds.Player1Keypad.Green)
-	o.changeChipBit(0, 3, leds.Player1Keypad.Blue)
-	o.changeChipBit(0, 4, leds.GlobalKeypad.WhiteLeft)
 
-	o.changeChipBit(0, 5, leds.Player1Keypad.Red)
-	o.changeChipBit(0, 6, leds.Player1Keypad.Yellow)
-	o.changeChipBit(0, 7, leds.Player1Keypad.Green)
-	o.changeChipBit(1, 0, leds.Player1Keypad.Blue)
-	o.changeChipBit(1, 7, leds.GlobalKeypad.WhiteLeft)
+	o.changeChipBit(0, 0, leds.GlobalKeypad.WhiteLeft)
+	o.changeChipBit(0, 1, leds.Player1Keypad.Green)
+	o.changeChipBit(0, 2, leds.Player1Keypad.Blue)
+	o.changeChipBit(0, 3, leds.Player1Keypad.Yellow)
+
+	o.changeChipBit(0, 4, leds.Player2Keypad.Green)
+	o.changeChipBit(0, 5, leds.Player2Keypad.Blue)
+	o.changeChipBit(0, 6, leds.Player2Keypad.Yellow)
+	o.changeChipBit(0, 7, leds.Player2Keypad.Red)
+
+	o.changeChipBit(1, 0, leds.Player1Keypad.Red)
+	o.changeChipBit(1, 7, leds.GlobalKeypad.WhiteRight)
 }
 
 func (o *panel) changeChipBit(chip uint8, bit uint8, state bool) {
