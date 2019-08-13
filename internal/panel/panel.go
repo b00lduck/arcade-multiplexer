@@ -9,6 +9,10 @@ import (
 	"periph.io/x/periph/conn/i2c"
 )
 
+type InputProcessor interface {
+	ProcessMatrix(data.MatrixState)
+}
+
 type panel struct {
 	state         uint32
 	chips         []i2c.Dev
@@ -17,7 +21,8 @@ type panel struct {
 
 	selectedRow uint8
 
-	matrixState data.MatrixState
+	matrixState    data.MatrixState
+	inputProcessor InputProcessor
 }
 
 /*
@@ -60,7 +65,7 @@ type panel struct {
 
 const NUM_ROWS = 4
 
-func NewPanel(bus i2c.Bus) *panel {
+func NewPanel(bus i2c.Bus, processor InputProcessor) *panel {
 
 	// Address the devices on the I²C bus
 	chip0 := i2c.Dev{Bus: bus, Addr: 0x20}
@@ -72,13 +77,14 @@ func NewPanel(bus i2c.Bus) *panel {
 	chip2.Write([]byte{0xff})
 
 	return &panel{
-		chips:         []i2c.Dev{chip0, chip1, chip2},
-		writtenStates: []uint8{0xff, 0xff, 0xff},
-		readStates:    []uint8{0xff, 0xff, 0xff}}
+		chips:          []i2c.Dev{chip0, chip1, chip2},
+		writtenStates:  []uint8{0xff, 0xff, 0xff},
+		readStates:     []uint8{0xff, 0xff, 0xff},
+		inputProcessor: processor}
 
 }
 
-func (o *panel) Run(changeEvent func(data.MatrixState)) {
+func (o *panel) Run() {
 
 	for {
 		o.selectNextRow()
@@ -95,11 +101,10 @@ func (o *panel) Run(changeEvent func(data.MatrixState)) {
 
 		if newMatrix.Changed(o.matrixState) {
 			o.matrixState = newMatrix
-			changeEvent(o.matrixState)
+			o.inputProcessor.ProcessMatrix(o.matrixState)
 		}
 
 		time.Sleep(1000 * time.Microsecond)
-
 	}
 
 }

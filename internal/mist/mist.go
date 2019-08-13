@@ -46,12 +46,12 @@ func NewMist(bus i2c.Bus) *mist {
 	chip2 := i2c.Dev{Bus: bus, Addr: 0x24}
 
 	chip1.Write([]byte{0xff})
-	chip2.Write([]byte{0xff})
+	chip2.Write([]byte{0xef})
 
 	return &mist{
 		chips:         []i2c.Dev{chip1, chip2},
-		writtenStates: []uint8{0xff, 0xff},
-		readStates:    []uint8{0xff, 0xff}}
+		writtenStates: []uint8{0xff, 0xef},
+		readStates:    []uint8{0xff, 0xef}}
 
 }
 
@@ -102,7 +102,7 @@ func (o *mist) SetPower(state bool) {
 }
 
 func (o *mist) SetResetButton(state bool) {
-	o.changeChipBit(1, 5, !state)
+	o.changeChipBit(1, 7, !state)
 }
 
 func (o *mist) changeChipBit(chip uint8, bit uint8, state bool) {

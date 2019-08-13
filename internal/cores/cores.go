@@ -58,7 +58,7 @@ var Amiga = &Core{
 		hid.KEY_ENTER,
 		hid.KEY_UP,
 		hid.KEY_ENTER},
-	bootSleep: 11000 * time.Millisecond,
+	bootSleep: 11500 * time.Millisecond,
 	speed1:    15 * time.Millisecond,
 	speed2:    30 * time.Millisecond,
 }
@@ -88,6 +88,17 @@ var C64 = &Core{
 	bootSleep: 4000 * time.Millisecond,
 	speed1:    25 * time.Millisecond,
 	speed2:    40 * time.Millisecond,
+}
+
+func CoreFromString(name string) *Core {
+	switch name {
+	case "C64":
+		return C64
+	case "Amiga":
+		return Amiga
+	default:
+		return nil
+	}
 }
 
 func ChangeCore(oldCore, newCore *Core) {

@@ -63,6 +63,16 @@ games:
       - input: P1_RED
         output: JOY2_BUTTON1  
         
+  - name: Lazy Jones
+    core: C64
+    index: 2
+    image: lazy_jones.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY2_AXES
+      - input: P1_RED
+        output: JOY2_BUTTON1  
+                
   - name: E-motion
     core: Amiga
     index: 1
@@ -76,14 +86,38 @@ games:
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1  
-      - input: P1_JOY
-        output: JOY1_AXES
       - input: WHITE_LEFT
         output: KEY_SPACE        
 
-  - name: Turrican 2
+  - name: Deflektor
     core: Amiga
     index: 2
+    image: deflektor.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: WHITE_LEFT
+        output: JOY2_BUTTON1  
+
+  - name: Badlands
+    core: Amiga
+    index: 3
+    image: badlands.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1          
+
+  - name: Turrican 2
+    core: Amiga
+    index: 4
     image: turrican2.jpg
     mappings:
       - input: P1_JOY
@@ -97,13 +131,3 @@ games:
         output: KEY_SPACE  
       - input: WHITE_LEFT
         output: KEY_ESCAPE
-
-  - name: Turrican 2
-    core: Amiga
-    index: 3
-    image: deflektor.jpg
-    mappings:
-      - input: P1_JOY
-        output: JOY1_AXES
-      - input: P1_RED
-        output: JOY1_BUTTON1  

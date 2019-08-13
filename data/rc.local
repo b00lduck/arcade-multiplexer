@@ -12,6 +12,7 @@
 # By default this script does nothing.
 
 /root/install_hid.sh
-#/root/arcade-multiplexer/arcade-multiplexer &
+cd /root/arcade-multiplexer
+nohup ./arcade-multiplexer &
 
 exit 0

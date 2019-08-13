@@ -1,59 +1,85 @@
 package ui
 
 import (
-	"image"
-	"image/color"
+	"time"
 
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/basicfont"
-	"golang.org/x/image/math/fixed"
+	"github.com/b00lduck/arcade-multiplexer/internal/config"
+	"github.com/b00lduck/arcade-multiplexer/internal/cores"
+	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"github.com/tarent/logrus"
 )
 
 type Display interface {
-	ShowImage(image.Image) error
+	ShowImage(filename string)
+}
+
+type Panel interface {
+	SetLeds(data.LedState)
+}
+
+type InputProcessor interface {
+	SetMappings([]config.Mapping)
+}
+
+type Mist interface {
+	SetResetButton(bool)
 }
 
 type ui struct {
-	display      Display
-	currentGame  string
-	selectedGame string
+	display        Display
+	panel          Panel
+	config         *config.Config
+	oldGame        config.Game
+	inputProcessor InputProcessor
+	mist           Mist
 }
 
-func NewUi(display Display) *ui {
+func NewUi(c *config.Config, display Display, panel Panel, ip InputProcessor, mist Mist) *ui {
 	return &ui{
-		display: display}
+		display:        display,
+		panel:          panel,
+		config:         c,
+		oldGame:        config.Game{},
+		inputProcessor: ip,
+		mist:           mist}
 }
 
-func (u *ui) SelectedGame(s string) {
-	u.selectedGame = s
-	u.Draw()
+func (u *ui) StartGameById(id uint32) {
+	u.startGame(u.config.Games[id])
 }
 
-func (u *ui) CurrentGame(s string) {
-	u.currentGame = s
-	u.Draw()
+func (u *ui) SelectGameById(id uint32) {
+	u.selectGame(u.config.Games[id])
 }
 
-func (u *ui) Draw() {
+func (u *ui) startGame(game config.Game) {
 
-	i := image.NewRGBA(image.Rect(0, 0, 128, 64))
-	src := image.NewUniform(color.RGBA{255, 255, 255, 255})
-	d := &font.Drawer{
-		Dst:  i,
-		Src:  src,
-		Face: basicfont.Face7x13,
-		Dot:  fixed.Point26_6{}}
+	//oldCore := cores.CoreFromString(u.oldGame.Core)
+	u.oldGame = game
 
-	d.Dot = fixed.Point26_6{
-		fixed.Int26_6(64),
-		fixed.Int26_6(2 * 14 * 64)}
-	d.DrawString(u.currentGame)
+	logrus.WithField("game", game).Info("Starting game")
 
-	d.Dot = fixed.Point26_6{
-		fixed.Int26_6(64),
-		fixed.Int26_6(4 * 14 * 64)}
-	d.DrawString(u.selectedGame)
+	u.panel.SetLeds(data.LedStateByMapping(game.Mappings))
+	if game.Image != "" {
+		u.display.ShowImage(game.Image)
+	}
+	u.inputProcessor.SetMappings(game.Mappings)
 
-	u.display.ShowImage(i)
+	u.mist.SetResetButton(true)
+	time.Sleep(50 * time.Millisecond)
+	u.mist.SetResetButton(false)
 
+	time.Sleep(1000 * time.Millisecond)
+
+	newCore := cores.CoreFromString(game.Core)
+	cores.ChangeCore(cores.Menu, newCore)
+	cores.LoadGame(&game, newCore)
+
+}
+
+func (u *ui) selectGame(game config.Game) {
+	logrus.WithField("game", game).Info("Selected game")
+	if game.Image != "" {
+		u.display.ShowImage(game.Image)
+	}
 }
