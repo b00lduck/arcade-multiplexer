@@ -117,30 +117,30 @@ func (o *panel) decodeMatrix() data.MatrixState {
 
 	switch o.selectedRow {
 	case 0:
-		newMatrix.Player1Keypad.Red = col0
+		newMatrix.GlobalKeypad.WhiteLeft = col0
 		newMatrix.Player2Keypad.Red = col1
-		newMatrix.GlobalKeypad.WhiteLeft = col2
+		newMatrix.Player1Keypad.Red = col2
 		newMatrix.Player1Joystick.Right = col3
 		newMatrix.Player2Joystick.Down = col4
 
 	case 1:
-		newMatrix.Player1Keypad.Yellow = col0
+		newMatrix.GlobalKeypad.WhiteRight = col0
 		newMatrix.Player2Keypad.Yellow = col1
-		newMatrix.GlobalKeypad.WhiteRight = col2
+		newMatrix.Player1Keypad.Yellow = col2
 		newMatrix.Player1Joystick.Left = col3
 		newMatrix.Player2Joystick.Right = col4
 
 	case 2:
-		newMatrix.Player1Keypad.Green = col0
+		newMatrix.GlobalKeypad.FlipperRight = col0
 		newMatrix.Player2Keypad.Green = col1
-		newMatrix.GlobalKeypad.FlipperRight = col2
+		newMatrix.Player1Keypad.Green = col2
 		newMatrix.Player1Joystick.Up = col3
 		newMatrix.Player2Joystick.Left = col4
 
 	case 3:
-		newMatrix.Player1Keypad.Blue = col0
+		newMatrix.GlobalKeypad.FlipperLeft = col0
 		newMatrix.Player2Keypad.Blue = col1
-		newMatrix.GlobalKeypad.FlipperLeft = col2
+		newMatrix.Player1Keypad.Blue = col2
 		newMatrix.Player1Joystick.Down = col3
 		newMatrix.Player2Joystick.Up = col4
 	}
@@ -177,6 +177,13 @@ func (o *panel) SetLeds(leds data.LedState) {
 
 	o.changeChipBit(1, 0, leds.Player1Keypad.Red)
 	o.changeChipBit(1, 7, leds.GlobalKeypad.WhiteRight)
+}
+
+func (o *panel) LedsOff() {
+	o.SetLeds(data.LedState{
+		Player1Keypad: data.PlayerKeypad{},
+		Player2Keypad: data.PlayerKeypad{},
+		GlobalKeypad:  data.GlobalKeypad{}})
 }
 
 func (o *panel) changeChipBit(chip uint8, bit uint8, state bool) {

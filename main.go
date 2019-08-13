@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/config"
+	"github.com/b00lduck/arcade-multiplexer/internal/cores"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
 	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
 	"github.com/b00lduck/arcade-multiplexer/internal/mist"
@@ -25,6 +26,15 @@ import (
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/host"
 )
+
+type Mist interface {
+	SetJoystick1(joy *data.Joystick)
+	SetJoystick2(joy *data.Joystick)
+	SetJoystick1Button1(state bool)
+	SetJoystick1Button2(state bool)
+	SetJoystick2Button1(state bool)
+	SetJoystick2Button2(state bool)
+}
 
 func main() {
 
@@ -62,14 +72,44 @@ func main() {
 	mist := mist.NewMist(bus)
 	go mist.Run()
 
+	mappings := []config.Mapping{}
+
 	// Initialize connection to panel board
 	panel := panel.NewPanel(bus)
 	go panel.Run(func(ms data.MatrixState) {
 		fmt.Println(ms.String())
 
-		mist.SetJoystick(&ms.Player1Joystick, &ms.Player2Joystick,
-			ms.Player1Keypad.Red, ms.Player1Keypad.Yellow,
-			ms.Player2Keypad.Red, ms.Player2Keypad.Yellow)
+		for _, v := range mappings {
+			switch v.Input {
+			case "P1_JOY":
+				OutputJoystick(mist, &ms.Player1Joystick, v.Output)
+			case "P1_RED":
+				OutputButton(mist, ms.Player1Keypad.Red, v.Output)
+			case "P1_YELLOW":
+				OutputButton(mist, ms.Player1Keypad.Yellow, v.Output)
+			case "P1_BLUE":
+				OutputButton(mist, ms.Player1Keypad.Blue, v.Output)
+			case "P1_GREEN":
+				OutputButton(mist, ms.Player1Keypad.Green, v.Output)
+
+			case "P2_JOY":
+				OutputJoystick(mist, &ms.Player2Joystick, v.Output)
+			case "P2_RED":
+				OutputButton(mist, ms.Player2Keypad.Red, v.Output)
+			case "P2_YELLOW":
+				OutputButton(mist, ms.Player2Keypad.Yellow, v.Output)
+			case "P2_BLUE":
+				OutputButton(mist, ms.Player2Keypad.Blue, v.Output)
+			case "P2_GREEN":
+				OutputButton(mist, ms.Player2Keypad.Green, v.Output)
+
+			case "WHITE_LEFT":
+				OutputButton(mist, ms.GlobalKeypad.WhiteLeft, v.Output)
+			case "WHITE_RIGHT":
+				OutputButton(mist, ms.GlobalKeypad.WhiteRight, v.Output)
+			}
+
+		}
 
 		fmt.Printf("\033[7A")
 	})
@@ -96,9 +136,9 @@ func main() {
 	go rotary.Run()
 
 	posi := 0
+	oldPosi := 0
 
 	go func() {
-		oldPosi := 0
 		for {
 			d := rotary.Delta()
 			if d != 0 {
@@ -112,39 +152,33 @@ func main() {
 		}
 	}()
 
+	panel.LedsOff()
+
+	// LOAD GAME
+	mist.SetResetButton(true)
+	time.Sleep(200 * time.Millisecond)
+	mist.SetResetButton(false)
+
+	game := c.Games[1]
+	mappings = game.Mappings
+	panel.SetLeds(data.LedStateByMapping(game.Mappings))
+	if game.Image != "" {
+		gameImage := LoadImage(game.Image)
+		draw.Draw(*fb, (*fb).Bounds(), gameImage, image.ZP, draw.Src)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	switch game.Core {
+	case "C64":
+		cores.ChangeCore(cores.Menu, cores.C64)
+		cores.LoadGame(&game, cores.C64)
+	case "Amiga":
+		cores.ChangeCore(cores.Menu, cores.Amiga)
+		cores.LoadGame(&game, cores.Amiga)
+	}
+
 	for {
-		panel.SetLeds(data.LedState{
-			Player1Keypad: data.PlayerKeypad{
-				Red:    true,
-				Yellow: true,
-				Green:  true,
-				Blue:   true},
-			Player2Keypad: data.PlayerKeypad{
-				Red:    true,
-				Yellow: true,
-				Green:  true,
-				Blue:   true},
-			GlobalKeypad: data.GlobalKeypad{
-				WhiteLeft:  true,
-				WhiteRight: true}})
-
-		time.Sleep(500 * time.Millisecond)
-
-		panel.SetLeds(data.LedState{
-			Player1Keypad: data.PlayerKeypad{
-				Red:    true,
-				Yellow: false,
-				Green:  false,
-				Blue:   false},
-			Player2Keypad: data.PlayerKeypad{
-				Red:    true,
-				Yellow: false,
-				Green:  false,
-				Blue:   false},
-			GlobalKeypad: data.GlobalKeypad{
-				WhiteLeft:  false,
-				WhiteRight: false}})
-
 		time.Sleep(500 * time.Millisecond)
 	}
 
@@ -174,4 +208,61 @@ func LoadImage(filename string) image.Image {
 	}
 
 	return img
+}
+
+func OutputJoystick(mist Mist, in *data.Joystick, out string) {
+	switch out {
+	case "JOY1_AXES":
+		mist.SetJoystick1(in)
+	case "JOY2_AXES":
+		mist.SetJoystick2(in)
+	}
+}
+
+func OutputButton(mist Mist, in bool, out string) {
+	switch out {
+	case "JOY1_BUTTON1":
+		mist.SetJoystick1Button1(in)
+	case "JOY1_BUTTON2":
+		mist.SetJoystick1Button2(in)
+	case "JOY2_BUTTON1":
+		mist.SetJoystick2Button1(in)
+	case "JOY2_BUTTON2":
+		mist.SetJoystick2Button2(in)
+
+	case "JOY1_UP":
+		// not implemented
+	case "JOY1_DOWN":
+		// not implemented
+	case "JOY1_LEFT":
+		// not implemented
+	case "JOY1_RIGHT":
+		// not implemented
+
+	case "JOY2_UP":
+		// not implemented
+	case "JOY2_DOWN":
+		// not implemented
+	case "JOY2_LEFT":
+		// not implemented
+	case "JOY2_RIGHT":
+		// not implemented
+
+	case "KEY_SPACE":
+		// not implemented
+	case "KEY_ESCAPE":
+		// not implemented
+	case "KEY_LSHIFT":
+		// not implemented
+	case "KEY_RSHIFT":
+		// not implemented
+	case "KEY_1":
+		// not implemented
+	case "KEY_2":
+		// not implemented
+	case "KEY_3":
+		// not implemented
+	case "KEY_4":
+		// not implemented
+	}
 }

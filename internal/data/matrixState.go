@@ -25,9 +25,3 @@ func (m MatrixState) String() string {
 	ret += "Global Keypad: " + m.GlobalKeypad.String() + "\n"
 	return ret
 }
-
-type LedState struct {
-	Player1Keypad PlayerKeypad
-	Player2Keypad PlayerKeypad
-	GlobalKeypad  GlobalKeypad
-}

@@ -18,21 +18,21 @@ type mist struct {
 /*
 	Chip 1 (0x23)
 	------
-	0 O Joy P1 UP
-	1 O Joy P1 DOWN
-	2 O Joy P1 LEFT
-	3 O Joy P1 RIGHT
-	4 O Joy P1 BUT 1
-	5 O Joy P1 BUT 2
-	6 O Joy P2 UP
-	7 O Joy P2 DOWN
+	0 O Joy P2 UP
+	1 O Joy P2 DOWN
+	2 O Joy P2 LEFT
+	3 O Joy P2 RIGHT
+	4 O Joy P2 BUT 1
+	5 O Joy P2 BUT 2
+	6 O Joy P1 DOWN
+	7 O Joy P1 UP
 
 	Chip 2 (0x24)
 	------
-	0 O Joy P2 LEFT
-	1 O Joy P2 RIGHT
-	2 O Joy P2 BUT 1
-	3 O Joy P2 BUT 2
+	0 O Joy P1 LEFT
+	1 O Joy P1 RIGHT
+	2 O Joy P1 BUT 1
+	3 O Joy P1 BUT 2
 	4 O Power on
 	5 O Reset Button
 	6 I LED
@@ -57,30 +57,44 @@ func NewMist(bus i2c.Bus) *mist {
 
 func (o *mist) Run() {
 	for {
-		//logrus.Info(fmt.Sprintf("%08b %08b %08b", o.writtenStates[0], o.writtenStates[1], o.writtenStates[2]))
+		//logrus.Info(fmt.Sprintf("%08b %08bb", o.writtenStates[0], o.writtenStates[1]))
 		for k, v := range o.chips {
 			r := []byte{0}
 			v.Tx([]byte{o.writtenStates[k]}, r)
 			o.readStates[k] = r[0]
 		}
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 
-func (o *mist) SetJoystick(joy1, joy2 *data.Joystick, j1b1, j1b2, j2b1, j2b2 bool) {
-	o.changeChipBit(0, 0, !joy1.Up)
-	o.changeChipBit(0, 1, !joy1.Down)
-	o.changeChipBit(0, 2, !joy1.Left)
-	o.changeChipBit(0, 3, !joy1.Right)
-	o.changeChipBit(0, 4, !j1b1)
-	o.changeChipBit(0, 5, !j1b2)
+func (o *mist) SetJoystick1(joy *data.Joystick) {
+	o.changeChipBit(0, 7, !joy.Up)
+	o.changeChipBit(0, 6, !joy.Down)
+	o.changeChipBit(1, 0, !joy.Left)
+	o.changeChipBit(1, 1, !joy.Right)
+}
 
-	o.changeChipBit(0, 6, !joy2.Up)
-	o.changeChipBit(0, 7, !joy2.Down)
-	o.changeChipBit(1, 0, !joy2.Left)
-	o.changeChipBit(1, 1, !joy2.Right)
-	o.changeChipBit(1, 2, !j2b1)
-	o.changeChipBit(1, 3, !j2b2)
+func (o *mist) SetJoystick1Button1(state bool) {
+	o.changeChipBit(1, 2, !state)
+}
+
+func (o *mist) SetJoystick1Button2(state bool) {
+	o.changeChipBit(1, 3, !state)
+}
+
+func (o *mist) SetJoystick2(joy *data.Joystick) {
+	o.changeChipBit(0, 0, !joy.Up)
+	o.changeChipBit(0, 1, !joy.Down)
+	o.changeChipBit(0, 2, !joy.Left)
+	o.changeChipBit(0, 3, !joy.Right)
+}
+
+func (o *mist) SetJoystick2Button1(state bool) {
+	o.changeChipBit(0, 4, !state)
+}
+
+func (o *mist) SetJoystick2Button2(state bool) {
+	o.changeChipBit(0, 5, !state)
 }
 
 func (o *mist) SetPower(state bool) {

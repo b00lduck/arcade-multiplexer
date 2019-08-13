@@ -8,6 +8,7 @@ type Game struct {
 	Name     string    `yaml:"name"`
 	Core     string    `yaml:"core"`
 	Image    string    `yaml:"image"`
+	Index    int       `yaml:"index"`
 	Mappings []Mapping `yaml:"mappings"`
 }
 

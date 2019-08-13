@@ -52,34 +52,38 @@
 # KEY_4
 
 games:
-  - name: Test
-    core: C64
-    image: turrican2.jpg
-    mappings:
-      - input: P1_JOY
-        output: JOY1_AXES
-      - input: P1_RED
-        output: JOY1_BUTTON1  
-      - input: P1_YELLOW
-        output: JOY1_BUTTON2  
-      - input: P2_JOY
-        output: JOY2_AXES
-      - input: P2_RED
-        output: JOY2_BUTTON1  
-      - input: P2_YELLOW
-        output: JOY2_BUTTON2  
 
   - name: Drelbs
     core: C64
+    index: 1
     image: drelbs.jpg
     mappings:
       - input: P1_JOY
         output: JOY2_AXES
       - input: P1_RED
         output: JOY2_BUTTON1  
+        
+  - name: E-motion
+    core: Amiga
+    index: 1
+    image: e-motion.jpg    
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1  
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: WHITE_LEFT
+        output: KEY_SPACE        
 
   - name: Turrican 2
     core: Amiga
+    index: 2
     image: turrican2.jpg
     mappings:
       - input: P1_JOY
@@ -93,3 +97,13 @@ games:
         output: KEY_SPACE  
       - input: WHITE_LEFT
         output: KEY_ESCAPE
+
+  - name: Turrican 2
+    core: Amiga
+    index: 3
+    image: deflektor.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  

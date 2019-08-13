@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/b00lduck/arcade-multiplexer/internal/config"
 	"github.com/b00lduck/arcade-multiplexer/internal/hid"
 	"github.com/sirupsen/logrus"
 )
@@ -47,9 +48,6 @@ var Amiga = &Core{
 		hid.KEY_ENTER,
 		hid.KEY_HOME,
 		hid.KEY_DOWN,
-		hid.KEY_DOWN,
-		hid.KEY_DOWN,
-		hid.KEY_DOWN,
 		hid.KEY_ENTER},
 	run: []hid.Key{
 		hid.KEY_WAIT,
@@ -62,7 +60,7 @@ var Amiga = &Core{
 		hid.KEY_ENTER},
 	bootSleep: 11000 * time.Millisecond,
 	speed1:    15 * time.Millisecond,
-	speed2:    25 * time.Millisecond,
+	speed2:    30 * time.Millisecond,
 }
 
 var C64 = &Core{
@@ -87,7 +85,7 @@ var C64 = &Core{
 		hid.KEY_U,
 		hid.KEY_N,
 		hid.KEY_ENTER},
-	bootSleep: 3500 * time.Millisecond,
+	bootSleep: 4000 * time.Millisecond,
 	speed1:    25 * time.Millisecond,
 	speed2:    40 * time.Millisecond,
 }
@@ -108,8 +106,7 @@ func ChangeCore(oldCore, newCore *Core) {
 
 	file, err := os.OpenFile("/dev/hidg0", os.O_WRONLY, os.ModeDevice)
 	if err != nil {
-		logrus.Error("Error opening /dev/hidg0")
-		return
+		logrus.WithError(err).Fatal("Error opening /dev/hidg0")
 	}
 	defer file.Close()
 	if oldCore != nil {
@@ -120,23 +117,24 @@ func ChangeCore(oldCore, newCore *Core) {
 	time.Sleep(newCore.bootSleep)
 }
 
-func LoadGame(core *Core, index int) {
+func LoadGame(game *config.Game, core *Core) {
 
-	logrus.WithField("index", index).
-		Info("Load game")
+	logrus.WithField("name", game.Name).
+		WithField("core", game.Core).
+		Info("Loading game")
 
 	file, err := os.OpenFile("/dev/hidg0", os.O_WRONLY, os.ModeDevice)
 	if err != nil {
-		logrus.Error("Error opening /dev/hidg0")
-		return
+		logrus.WithError(err).Fatal("Error opening /dev/hidg0")
 	}
 	defer file.Close()
 	hid.WriteSequence(file, core.load, core.speed1, core.speed2)
 
-	for i := 0; i < index; i++ {
+	for i := 0; i < game.Index; i++ {
 		hid.WriteSequence(file, []hid.Key{hid.KEY_DOWN}, core.speed1, core.speed2)
 	}
 	hid.WriteSequence(file, []hid.Key{hid.KEY_ENTER}, core.speed1, core.speed2)
 
 	hid.WriteSequence(file, core.run, core.speed1, core.speed2)
+
 }
