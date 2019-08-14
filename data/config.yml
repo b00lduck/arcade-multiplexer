@@ -60,8 +60,11 @@ games:
     mappings:
       - input: P1_JOY
         output: JOY2_AXES
+      - input: P1_YELLOW
+        output: JOY2_BUTTON1
+        autofire: true        
       - input: P1_RED
-        output: JOY2_BUTTON1  
+        output: JOY2_BUTTON1
         
   - name: Lazy Jones
     core: C64
@@ -125,7 +128,7 @@ games:
       - input: P1_RED
         output: JOY1_BUTTON1  
       - input: P1_YELLOW
-        output: JOY1_BUTTON2  
+        output: JOY1_BUTTON1
         autofire: true
       - input: P1_BLUE
         output: KEY_SPACE  

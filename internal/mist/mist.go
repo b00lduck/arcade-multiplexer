@@ -13,6 +13,9 @@ type mist struct {
 	chips         []i2c.Dev
 	writtenStates []uint8
 	readStates    []uint8
+	buttonStates  []data.ButtonState
+	afcount       uint32
+	afstate       bool
 }
 
 /*
@@ -51,12 +54,31 @@ func NewMist(bus i2c.Bus) *mist {
 	return &mist{
 		chips:         []i2c.Dev{chip1, chip2},
 		writtenStates: []uint8{0xff, 0xef},
-		readStates:    []uint8{0xff, 0xef}}
+		readStates:    []uint8{0xff, 0xef},
+		buttonStates:  make([]data.ButtonState, 4)}
 
 }
 
+func (o *mist) AutoFired(bs *data.ButtonState) bool {
+	if bs.Autofire {
+		return bs.State && o.afstate
+	}
+	return bs.State
+}
+
 func (o *mist) Run() {
+
 	for {
+		o.afcount++
+		if o.afcount > 20 {
+			o.afcount = 0
+			o.afstate = !o.afstate
+		}
+		o.changeChipBit(1, 2, !o.AutoFired(&o.buttonStates[0]))
+		o.changeChipBit(1, 3, !o.AutoFired(&o.buttonStates[1]))
+		o.changeChipBit(0, 4, !o.AutoFired(&o.buttonStates[2]))
+		o.changeChipBit(0, 5, !o.AutoFired(&o.buttonStates[3]))
+
 		//logrus.Info(fmt.Sprintf("%08b %08bb", o.writtenStates[0], o.writtenStates[1]))
 		for k, v := range o.chips {
 			r := []byte{0}
@@ -67,6 +89,10 @@ func (o *mist) Run() {
 	}
 }
 
+func (o *mist) SetJoystickButton(id uint8, bs data.ButtonState) {
+	o.buttonStates[id] = bs
+}
+
 func (o *mist) SetJoystick1(joy *data.Joystick) {
 	o.changeChipBit(0, 7, !joy.Up)
 	o.changeChipBit(0, 6, !joy.Down)
@@ -74,27 +100,11 @@ func (o *mist) SetJoystick1(joy *data.Joystick) {
 	o.changeChipBit(1, 1, !joy.Right)
 }
 
-func (o *mist) SetJoystick1Button1(state bool) {
-	o.changeChipBit(1, 2, !state)
-}
-
-func (o *mist) SetJoystick1Button2(state bool) {
-	o.changeChipBit(1, 3, !state)
-}
-
 func (o *mist) SetJoystick2(joy *data.Joystick) {
 	o.changeChipBit(0, 0, !joy.Up)
 	o.changeChipBit(0, 1, !joy.Down)
 	o.changeChipBit(0, 2, !joy.Left)
 	o.changeChipBit(0, 3, !joy.Right)
-}
-
-func (o *mist) SetJoystick2Button1(state bool) {
-	o.changeChipBit(0, 4, !state)
-}
-
-func (o *mist) SetJoystick2Button2(state bool) {
-	o.changeChipBit(0, 5, !state)
 }
 
 func (o *mist) SetPower(state bool) {

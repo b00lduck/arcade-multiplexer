@@ -11,16 +11,15 @@ import (
 type Mist interface {
 	SetJoystick1(in *data.Joystick)
 	SetJoystick2(in *data.Joystick)
-	SetJoystick1Button1(bool)
-	SetJoystick1Button2(bool)
-	SetJoystick2Button1(bool)
-	SetJoystick2Button2(bool)
+	SetJoystickButton(uint8, data.ButtonState)
 }
 
 type inputProcessor struct {
 	mist     Mist
 	mappings []config.Mapping
 	mutex    *sync.Mutex
+
+	buttonStates []data.ButtonState
 }
 
 func NewInputProcessor(mist Mist) *inputProcessor {
@@ -41,37 +40,74 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 	fmt.Printf("\033[7A")
 
 	i.mutex.Lock()
+
+	i.buttonStates = make([]data.ButtonState, 4)
+
 	for _, v := range i.mappings {
 		switch v.Input {
+
 		case "P1_JOY":
 			i.OutputJoystick(&ms.Player1Joystick, v.Output)
-		case "P1_RED":
-			i.OutputButton(ms.Player1Keypad.Red, v.Output)
-		case "P1_YELLOW":
-			i.OutputButton(ms.Player1Keypad.Yellow, v.Output)
-		case "P1_BLUE":
-			i.OutputButton(ms.Player1Keypad.Blue, v.Output)
-		case "P1_GREEN":
-			i.OutputButton(ms.Player1Keypad.Green, v.Output)
-
 		case "P2_JOY":
 			i.OutputJoystick(&ms.Player2Joystick, v.Output)
+
+		case "P1_RED":
+			i.RegisterButton(ms.Player1Keypad.Red, v.Output, v.Autofire)
+		case "P1_YELLOW":
+			i.RegisterButton(ms.Player1Keypad.Yellow, v.Output, v.Autofire)
+		case "P1_BLUE":
+			i.RegisterButton(ms.Player1Keypad.Blue, v.Output, v.Autofire)
+		case "P1_GREEN":
+			i.RegisterButton(ms.Player1Keypad.Green, v.Output, v.Autofire)
+
 		case "P2_RED":
-			i.OutputButton(ms.Player2Keypad.Red, v.Output)
+			i.RegisterButton(ms.Player2Keypad.Red, v.Output, v.Autofire)
 		case "P2_YELLOW":
-			i.OutputButton(ms.Player2Keypad.Yellow, v.Output)
+			i.RegisterButton(ms.Player2Keypad.Yellow, v.Output, v.Autofire)
 		case "P2_BLUE":
-			i.OutputButton(ms.Player2Keypad.Blue, v.Output)
+			i.RegisterButton(ms.Player2Keypad.Blue, v.Output, v.Autofire)
 		case "P2_GREEN":
-			i.OutputButton(ms.Player2Keypad.Green, v.Output)
+			i.RegisterButton(ms.Player2Keypad.Green, v.Output, v.Autofire)
 
 		case "WHITE_LEFT":
-			i.OutputButton(ms.GlobalKeypad.WhiteLeft, v.Output)
+			i.RegisterButton(ms.GlobalKeypad.WhiteLeft, v.Output, v.Autofire)
 		case "WHITE_RIGHT":
-			i.OutputButton(ms.GlobalKeypad.WhiteRight, v.Output)
+			i.RegisterButton(ms.GlobalKeypad.WhiteRight, v.Output, v.Autofire)
 		}
 	}
+
+	i.mist.SetJoystickButton(0, i.buttonStates[0])
+	i.mist.SetJoystickButton(1, i.buttonStates[1])
+	i.mist.SetJoystickButton(2, i.buttonStates[2])
+	i.mist.SetJoystickButton(3, i.buttonStates[3])
+
 	i.mutex.Unlock()
+}
+
+func (i *inputProcessor) RegisterButton(in bool, out string, autofire bool) {
+
+	if !in {
+		return
+	}
+
+	index := -1
+	switch out {
+	case "JOY1_BUTTON1":
+		index = 0
+	case "JOY1_BUTTON2":
+		index = 1
+	case "JOY2_BUTTON1":
+		index = 2
+	case "JOY2_BUTTON2":
+		index = 3
+	default:
+		return
+	}
+
+	i.buttonStates[index] = data.ButtonState{
+		State:    in,
+		Autofire: autofire}
+
 }
 
 func (i *inputProcessor) OutputJoystick(in *data.Joystick, out string) {
@@ -83,16 +119,18 @@ func (i *inputProcessor) OutputJoystick(in *data.Joystick, out string) {
 	}
 }
 
-func (i *inputProcessor) OutputButton(in bool, out string) {
+/*
+func (i *inputProcessor) OutputButton(in bool, out string, autofire bool) {
+
 	switch out {
 	case "JOY1_BUTTON1":
-		i.mist.SetJoystick1Button1(in)
+		i.mist.SetJoystick1Button1(in, autofire)
 	case "JOY1_BUTTON2":
-		i.mist.SetJoystick1Button2(in)
+		i.mist.SetJoystick1Button2(in, autofire)
 	case "JOY2_BUTTON1":
-		i.mist.SetJoystick2Button1(in)
+		i.mist.SetJoystick2Button1(in, autofire)
 	case "JOY2_BUTTON2":
-		i.mist.SetJoystick2Button2(in)
+		i.mist.SetJoystick2Button2(in, autofire)
 
 	case "JOY1_UP":
 		// not implemented
@@ -130,3 +168,4 @@ func (i *inputProcessor) OutputButton(in bool, out string) {
 		// not implemented
 	}
 }
+*/

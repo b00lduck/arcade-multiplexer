@@ -13,6 +13,7 @@ type Game struct {
 }
 
 type Mapping struct {
-	Input  string `yaml:"input"`
-	Output string `yaml:"output"`
+	Input    string `yaml:"input"`
+	Output   string `yaml:"output"`
+	Autofire bool   `yaml:"autofire"`
 }
