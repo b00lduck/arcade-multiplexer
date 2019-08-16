@@ -8,7 +8,7 @@ import (
 	"periph.io/x/periph/conn/i2c"
 )
 
-type mist struct {
+type mistDigital struct {
 	state         uint32
 	chips         []i2c.Dev
 	writtenStates []uint8
@@ -42,7 +42,7 @@ type mist struct {
 	7 I LED
 */
 
-func NewMist(bus i2c.Bus) *mist {
+func NewMistDigital(bus i2c.Bus) *mistDigital {
 
 	// Address the devices on the I²C bus
 	chip1 := i2c.Dev{Bus: bus, Addr: 0x23}
@@ -51,7 +51,7 @@ func NewMist(bus i2c.Bus) *mist {
 	chip1.Write([]byte{0xff})
 	chip2.Write([]byte{0xef})
 
-	return &mist{
+	return &mistDigital{
 		chips:         []i2c.Dev{chip1, chip2},
 		writtenStates: []uint8{0xff, 0xef},
 		readStates:    []uint8{0xff, 0xef},
@@ -59,14 +59,14 @@ func NewMist(bus i2c.Bus) *mist {
 
 }
 
-func (o *mist) AutoFired(bs *data.ButtonState) bool {
+func (o *mistDigital) AutoFired(bs *data.ButtonState) bool {
 	if bs.Autofire {
 		return bs.State && o.afstate
 	}
 	return bs.State
 }
 
-func (o *mist) Run() {
+func (o *mistDigital) Run() {
 
 	for {
 		o.afcount++
@@ -89,33 +89,33 @@ func (o *mist) Run() {
 	}
 }
 
-func (o *mist) SetJoystickButton(id uint8, bs data.ButtonState) {
+func (o *mistDigital) SetJoystickButton(id uint8, bs data.ButtonState) {
 	o.buttonStates[id] = bs
 }
 
-func (o *mist) SetJoystick1(joy *data.Joystick) {
+func (o *mistDigital) SetJoystick1(joy *data.Joystick) {
 	o.changeChipBit(0, 7, !joy.Up)
 	o.changeChipBit(0, 6, !joy.Down)
 	o.changeChipBit(1, 0, !joy.Left)
 	o.changeChipBit(1, 1, !joy.Right)
 }
 
-func (o *mist) SetJoystick2(joy *data.Joystick) {
+func (o *mistDigital) SetJoystick2(joy *data.Joystick) {
 	o.changeChipBit(0, 0, !joy.Up)
 	o.changeChipBit(0, 1, !joy.Down)
 	o.changeChipBit(0, 2, !joy.Left)
 	o.changeChipBit(0, 3, !joy.Right)
 }
 
-func (o *mist) SetPower(state bool) {
+func (o *mistDigital) SetPower(state bool) {
 	o.changeChipBit(1, 4, !state)
 }
 
-func (o *mist) SetResetButton(state bool) {
+func (o *mistDigital) SetResetButton(state bool) {
 	o.changeChipBit(1, 7, !state)
 }
 
-func (o *mist) changeChipBit(chip uint8, bit uint8, state bool) {
+func (o *mistDigital) changeChipBit(chip uint8, bit uint8, state bool) {
 	o.writtenStates[chip] = changeBit(o.writtenStates[chip], bit, state)
 }
 

@@ -137,15 +137,15 @@ func (o *panel) decodeMatrix() data.MatrixState {
 
 	case 2:
 		newMatrix.GlobalKeypad.FlipperRight = col0
-		newMatrix.Player2Keypad.Green = col1
-		newMatrix.Player1Keypad.Green = col2
+		newMatrix.Player2Keypad.Blue = col1
+		newMatrix.Player1Keypad.Blue = col2
 		newMatrix.Player1Joystick.Up = col3
 		newMatrix.Player2Joystick.Left = col4
 
 	case 3:
 		newMatrix.GlobalKeypad.FlipperLeft = col0
-		newMatrix.Player2Keypad.Blue = col1
-		newMatrix.Player1Keypad.Blue = col2
+		newMatrix.Player2Keypad.Green = col1
+		newMatrix.Player1Keypad.Green = col2
 		newMatrix.Player1Joystick.Down = col3
 		newMatrix.Player2Joystick.Up = col4
 	}

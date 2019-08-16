@@ -16,15 +16,22 @@ type Mist interface {
 
 type inputProcessor struct {
 	mist     Mist
+	hid      Hid
 	mappings []config.Mapping
 	mutex    *sync.Mutex
 
 	buttonStates []data.ButtonState
+	pressedKeys  []string
 }
 
-func NewInputProcessor(mist Mist) *inputProcessor {
+type Hid interface {
+	SetKeys([]string)
+}
+
+func NewInputProcessor(mist Mist, hid Hid) *inputProcessor {
 	return &inputProcessor{
 		mist:     mist,
+		hid:      hid,
 		mappings: []config.Mapping{},
 		mutex:    &sync.Mutex{}}
 }
@@ -42,6 +49,7 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 	i.mutex.Lock()
 
 	i.buttonStates = make([]data.ButtonState, 4)
+	i.pressedKeys = make([]string, 0)
 
 	for _, v := range i.mappings {
 		switch v.Input {
@@ -52,27 +60,27 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 			i.OutputJoystick(&ms.Player2Joystick, v.Output)
 
 		case "P1_RED":
-			i.RegisterButton(ms.Player1Keypad.Red, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player1Keypad.Red, v.Output, v.Autofire)
 		case "P1_YELLOW":
-			i.RegisterButton(ms.Player1Keypad.Yellow, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player1Keypad.Yellow, v.Output, v.Autofire)
 		case "P1_BLUE":
-			i.RegisterButton(ms.Player1Keypad.Blue, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player1Keypad.Blue, v.Output, v.Autofire)
 		case "P1_GREEN":
-			i.RegisterButton(ms.Player1Keypad.Green, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player1Keypad.Green, v.Output, v.Autofire)
 
 		case "P2_RED":
-			i.RegisterButton(ms.Player2Keypad.Red, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player2Keypad.Red, v.Output, v.Autofire)
 		case "P2_YELLOW":
-			i.RegisterButton(ms.Player2Keypad.Yellow, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player2Keypad.Yellow, v.Output, v.Autofire)
 		case "P2_BLUE":
-			i.RegisterButton(ms.Player2Keypad.Blue, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player2Keypad.Blue, v.Output, v.Autofire)
 		case "P2_GREEN":
-			i.RegisterButton(ms.Player2Keypad.Green, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.Player2Keypad.Green, v.Output, v.Autofire)
 
 		case "WHITE_LEFT":
-			i.RegisterButton(ms.GlobalKeypad.WhiteLeft, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.GlobalKeypad.WhiteLeft, v.Output, v.Autofire)
 		case "WHITE_RIGHT":
-			i.RegisterButton(ms.GlobalKeypad.WhiteRight, v.Output, v.Autofire)
+			i.RegisterButtonOrKey(ms.GlobalKeypad.WhiteRight, v.Output, v.Autofire)
 		}
 	}
 
@@ -81,33 +89,38 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 	i.mist.SetJoystickButton(2, i.buttonStates[2])
 	i.mist.SetJoystickButton(3, i.buttonStates[3])
 
+	i.hid.SetKeys(i.pressedKeys)
+
 	i.mutex.Unlock()
 }
 
-func (i *inputProcessor) RegisterButton(in bool, out string, autofire bool) {
-
+func (i *inputProcessor) RegisterButtonOrKey(in bool, out string, autofire bool) {
 	if !in {
 		return
 	}
 
-	index := -1
 	switch out {
 	case "JOY1_BUTTON1":
-		index = 0
+		i.registerButton(0, autofire)
 	case "JOY1_BUTTON2":
-		index = 1
+		i.registerButton(1, autofire)
 	case "JOY2_BUTTON1":
-		index = 2
+		i.registerButton(2, autofire)
 	case "JOY2_BUTTON2":
-		index = 3
+		i.registerButton(3, autofire)
 	default:
-		return
+		i.registerKey(out)
 	}
+}
 
+func (i *inputProcessor) registerButton(index int, autofire bool) {
 	i.buttonStates[index] = data.ButtonState{
-		State:    in,
+		State:    true,
 		Autofire: autofire}
+}
 
+func (i *inputProcessor) registerKey(out string) {
+	i.pressedKeys = append(i.pressedKeys, out)
 }
 
 func (i *inputProcessor) OutputJoystick(in *data.Joystick, out string) {
@@ -118,54 +131,3 @@ func (i *inputProcessor) OutputJoystick(in *data.Joystick, out string) {
 		i.mist.SetJoystick2(in)
 	}
 }
-
-/*
-func (i *inputProcessor) OutputButton(in bool, out string, autofire bool) {
-
-	switch out {
-	case "JOY1_BUTTON1":
-		i.mist.SetJoystick1Button1(in, autofire)
-	case "JOY1_BUTTON2":
-		i.mist.SetJoystick1Button2(in, autofire)
-	case "JOY2_BUTTON1":
-		i.mist.SetJoystick2Button1(in, autofire)
-	case "JOY2_BUTTON2":
-		i.mist.SetJoystick2Button2(in, autofire)
-
-	case "JOY1_UP":
-		// not implemented
-	case "JOY1_DOWN":
-		// not implemented
-	case "JOY1_LEFT":
-		// not implemented
-	case "JOY1_RIGHT":
-		// not implemented
-
-	case "JOY2_UP":
-		// not implemented
-	case "JOY2_DOWN":
-		// not implemented
-	case "JOY2_LEFT":
-		// not implemented
-	case "JOY2_RIGHT":
-		// not implemented
-
-	case "KEY_SPACE":
-		// not implemented
-	case "KEY_ESCAPE":
-		// not implemented
-	case "KEY_LSHIFT":
-		// not implemented
-	case "KEY_RSHIFT":
-		// not implemented
-	case "KEY_1":
-		// not implemented
-	case "KEY_2":
-		// not implemented
-	case "KEY_3":
-		// not implemented
-	case "KEY_4":
-		// not implemented
-	}
-}
-*/

@@ -118,9 +118,28 @@ games:
       - input: P2_RED
         output: JOY2_BUTTON1          
 
-  - name: Turrican 2
+  - name: Turrican
     core: Amiga
     index: 4
+    image: 
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P1_YELLOW
+        output: JOY1_BUTTON1
+        autofire: true
+      - input: P1_BLUE
+        output: KEY_SPACE  
+      - input: WHITE_LEFT
+        output: KEY_ESCAPE
+      - input: P2_RED
+        output: JOY2_BUTTON1          
+
+  - name: Turrican 2
+    core: Amiga
+    index: 5
     image: turrican2.jpg
     mappings:
       - input: P1_JOY
@@ -134,3 +153,75 @@ games:
         output: KEY_SPACE  
       - input: WHITE_LEFT
         output: KEY_ESCAPE
+      - input: P2_RED
+        output: JOY2_BUTTON1  
+
+  - name: MIG 29
+    core: Amiga
+    index: 6
+    image: 
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+
+cores:
+
+  - name: C64
+    enter:
+      - KEY_DOWN
+      - KEY_ENTER
+    exit:
+      - KEY_F12
+      - KEY_RIGHT
+      - KEY_ENTER
+      - KEY_ENTER
+      - KEY_HOME
+    load:
+      - KEY_F12
+      - KEY_DOWN
+      - KEY_ENTER
+      - KEY_HOME
+    run:
+      - KEY_WAIT_250
+      - KEY_R
+      - KEY_U
+      - KEY_N
+      - KEY_ENTER
+    bootSleep: 4000
+    speed1: 25
+    speed2: 40
+
+  - name: Amiga
+    enter:
+      - KEY_DOWN
+      - KEY_DOWN
+      - KEY_ENTER
+    exit: 
+      - KEY_F12
+      - KEY_RIGHT
+      - KEY_RIGHT
+      - KEY_ENTER
+      - KEY_ENTER
+      - KEY_HOME
+    load:
+      - KEY_F12
+      - KEY_ENTER
+      - KEY_HOME
+      - KEY_DOWN
+      - KEY_ENTER
+    run:
+      - KEY_WAIT_250
+      - KEY_RIGHT
+      - KEY_RIGHT
+      - KEY_DOWN
+      - KEY_DOWN
+      - KEY_ENTER
+      - KEY_UP
+      - KEY_ENTER
+    bootSleep: 11500
+    speed1: 15
+    speed2: 30
+
+ 

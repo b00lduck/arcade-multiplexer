@@ -1,10 +1,7 @@
 package ui
 
 import (
-	"time"
-
 	"github.com/b00lduck/arcade-multiplexer/internal/config"
-	"github.com/b00lduck/arcade-multiplexer/internal/cores"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
 	"github.com/tarent/logrus"
 )
@@ -21,8 +18,9 @@ type InputProcessor interface {
 	SetMappings([]config.Mapping)
 }
 
-type Mist interface {
-	SetResetButton(bool)
+type MistControl interface {
+	ChangeCore(*config.Core)
+	LoadGame(*config.Game, *config.Core)
 }
 
 type ui struct {
@@ -31,17 +29,17 @@ type ui struct {
 	config         *config.Config
 	oldGame        config.Game
 	inputProcessor InputProcessor
-	mist           Mist
+	mistControl    MistControl
 }
 
-func NewUi(c *config.Config, display Display, panel Panel, ip InputProcessor, mist Mist) *ui {
+func NewUi(c *config.Config, display Display, panel Panel, ip InputProcessor, mistControl MistControl) *ui {
 	return &ui{
 		display:        display,
 		panel:          panel,
 		config:         c,
 		oldGame:        config.Game{},
 		inputProcessor: ip,
-		mist:           mist}
+		mistControl:    mistControl}
 }
 
 func (u *ui) StartGameById(id uint32) {
@@ -65,15 +63,9 @@ func (u *ui) startGame(game config.Game) {
 	}
 	u.inputProcessor.SetMappings(game.Mappings)
 
-	u.mist.SetResetButton(true)
-	time.Sleep(50 * time.Millisecond)
-	u.mist.SetResetButton(false)
-
-	time.Sleep(1000 * time.Millisecond)
-
-	newCore := cores.CoreFromString(game.Core)
-	cores.ChangeCore(cores.Menu, newCore)
-	cores.LoadGame(&game, newCore)
+	newCore := u.config.GetCoreByName(game.Core)
+	u.mistControl.ChangeCore(newCore)
+	u.mistControl.LoadGame(&game, newCore)
 
 }
 

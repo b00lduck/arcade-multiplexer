@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,13 +10,13 @@ import (
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
 	"github.com/b00lduck/arcade-multiplexer/internal/display"
 	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
+	"github.com/b00lduck/arcade-multiplexer/internal/hid"
 	"github.com/b00lduck/arcade-multiplexer/internal/inputProcessor"
 	"github.com/b00lduck/arcade-multiplexer/internal/mist"
 	"github.com/b00lduck/arcade-multiplexer/internal/panel"
 	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
 	"github.com/b00lduck/arcade-multiplexer/internal/ui"
 	"github.com/tarent/logrus"
-	"gopkg.in/yaml.v2"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/host"
 )
@@ -57,25 +56,23 @@ func main() {
 	display.ShowImage("splash.jpg")
 
 	// Load game config from yml file
-	c := config.Config{}
-	yamlFile, err := ioutil.ReadFile("config.yml")
-	if err != nil {
-		logrus.WithError(err).Fatal("Error reading yaml file")
-	}
-	err = yaml.Unmarshal(yamlFile, &c)
-	if err != nil {
-		logrus.WithError(err).Fatal("Error parsing yaml file")
-	}
+
+	c := config.NewConfig()
 
 	// Initialize connection to MiST-interface board. This
 	// contains Joystick inputs, power and reset
-	mist := mist.NewMist(bus)
-	go mist.Run()
+	mistDigital := mist.NewMistDigital(bus)
+	go mistDigital.Run()
+
+	hid := hid.NewHid()
+	defer hid.Close()
+
+	mistControl := mist.NewMistControl(hid, mistDigital)
 
 	// Initialize connection to panel board and set input processor that
 	// translates the inputs from joysticks and buttons to the configured
 	// outputs of the active game
-	inputProcessor := inputProcessor.NewInputProcessor(mist)
+	inputProcessor := inputProcessor.NewInputProcessor(mistDigital, hid)
 	panel := panel.NewPanel(bus, inputProcessor)
 	go panel.Run()
 
@@ -89,9 +86,9 @@ func main() {
 		os.Exit(0)
 	}()
 
-	mist.SetPower(true)
+	mistDigital.SetPower(true)
 
-	ui := ui.NewUi(&c, display, panel, inputProcessor, mist)
+	ui := ui.NewUi(c, display, panel, inputProcessor, mistControl)
 
 	rotary := rotary.NewRotary(4, 5, 6, len(c.Games), ui.StartGameById, ui.SelectGameById)
 	go rotary.Run()
