@@ -104,10 +104,10 @@ games:
       - input: WHITE_LEFT
         output: JOY2_BUTTON1  
 
-  - name: Badlands
+  - name: Bubble Bobble
     core: Amiga
     index: 3
-    image: badlands.jpg
+    image: bubble_bobble.jpg
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
@@ -116,12 +116,16 @@ games:
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
-        output: JOY2_BUTTON1          
+        output: JOY2_BUTTON1  
+      - input: WHITE_LEFT
+        output: KEY_1         
+      - input: WHITE_RIGHT
+        output: KEY_2         
 
   - name: Turrican
     core: Amiga
     index: 4
-    image: 
+    image: turrican.jpg
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
@@ -140,6 +144,7 @@ games:
   - name: Turrican 2
     core: Amiga
     index: 5
+    disks: 2
     image: turrican2.jpg
     mappings:
       - input: P1_JOY
@@ -158,16 +163,277 @@ games:
 
   - name: MIG 29
     core: Amiga
-    index: 6
-    image: 
+    index: 7
+    image: mig29.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: WHITE_LEFT
+        output: KEY_1
+
+  - name: Alien Breed
+    core: Amiga
+    index: 8
+    disks: 2
+    image: alien_breed.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1          
+
+  - name: Ooops Up
+    core: Amiga
+    index: 10
+    image: ooops_up.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1                  
+      - input: P2_RED
+        output: JOY2_BUTTON1                  
+      - input: WHITE_LEFT
+        output: KEY_F1
+      - input: WHITE_RIGHT
+        output: KEY_F2
+
+  - name: Coloris
+    core: Amiga
+    index: 11
+    image: coloris.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1                  
+
+  - name: Giana Sisters
+    core: Amiga
+    index: 12
+    image: giana_sisters.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: WHITE_LEFT
+        output: KEY_1                        
+      - input: WHITE_LEFT
+        output: KEY_2
+
+  - name: International Karate +
+    core: Amiga
+    index: 13
+    image: ik+.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1            
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1
+
+  - name: Jumping Jackson
+    core: Amiga
+    index: 14
+    image: jumping_jackson.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1            
+
+  - name: Katakis
+    core: Amiga
+    index: 15
+    image: katakis.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+
+  - name: Lotus Esprit Turbo Challenge
+    core: Amiga
+    index: 16
+    image: lotus.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1
+
+  - name: Lotus Turbo Challenge 2
+    core: Amiga
+    index: 17
+    image: lotus2.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1        
+
+  - name: Lotus 3 - The ultimate challenge
+    core: Amiga
+    index: 18
+    disks: 2
+    image: lotus3.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1
+
+  - name: Super Cars
+    core: Amiga
+    index: 20
+    disks: 2
+    image: super_cars.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1        
+
+  - name: Super Cars II
+    core: Amiga
+    index: 22
+    disks: 2
+    image: super_cars2.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1        
+
+  - name: Stunt Car Racer
+    core: Amiga
+    index: 24
+    image: stunt_car_racer.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1               
+
+  - name: Badlands
+    core: Amiga
+    index: 25
+    image: badlands.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1    
+
+  - name: Micro Machines
+    core: Amiga
+    index: 26
+    image: micro_machines.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
+      - input: P2_JOY
+        output: JOY2_AXES
+      - input: P2_RED
+        output: JOY2_BUTTON1 
+
+
+  - name: Wings Of Fury
+    core: Amiga
+    index: 27
+    image: wings_of_fury.jpg
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1  
 
-cores:
+  - name: New Zealand Story
+    core: Amiga
+    index: 28
+    image: new_zealand_story.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1  
 
+  - name: Pinball Dreams
+    core: Amiga
+    index: 29
+    disks: 2
+    image: pinball_dreams.jpg
+    mappings:
+      - input: WHITE_LEFT
+        output: KEY_F1
+      - input: WHITE_RIGHT
+        output: KEY_F2
+      - input: FLIPPER_LEFT
+        output: KEY_LSHIFT
+      - input: FLIPPER_RIGHT
+        output: KEY_RSHIFT
+      - input: P1_RED
+        output: KEY_DOWN  
+      - input: P1_YELLOW
+        output: KEY_SPACE  
+
+  - name: Rick Dangerous
+    core: Amiga
+    index: 31
+    image: rick_dangerous.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1          
+
+  - name: Rick Dangerous 2
+    core: Amiga
+    index: 31
+    image: rick_dangerous_2.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1          
+
+cores:
   - name: C64
     enter:
       - KEY_DOWN
@@ -221,7 +487,7 @@ cores:
       - KEY_UP
       - KEY_ENTER
     bootSleep: 11500
-    speed1: 15
-    speed2: 30
+    speed1: 25
+    speed2: 40
 
  
