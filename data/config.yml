@@ -410,8 +410,10 @@ games:
         output: KEY_RSHIFT
       - input: P1_RED
         output: KEY_DOWN  
-      - input: P1_YELLOW
+      - input: P1_BLUE
         output: KEY_SPACE  
+      - input: P2_RED
+        output: JOY2_BUTTON1     
 
   - name: Rick Dangerous
     core: Amiga
@@ -425,13 +427,31 @@ games:
 
   - name: Rick Dangerous 2
     core: Amiga
-    index: 31
+    index: 32
     image: rick_dangerous_2.jpg
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1          
+
+  - name: North & South
+    core: C64
+    index: 1
+    image: north_and_south.jpg
+    mappings:
+      - input: P1_JOY
+        output: JOY1_AXES
+      - input: P1_RED
+        output: JOY1_BUTTON1
+      - input: P1_YELLOW
+        output: KEY_MOD_LSHIFT
+      - input: P2_JOY
+        output: KEY_ARROWS
+      - input: P2_RED
+        output: KEY_SPACE
+      - input: P2_YELLOW
+        output: KEY_MOD_RSHIFT
 
 cores:
   - name: C64

@@ -13,15 +13,18 @@ import (
   "KEY_WAIT": 0xff
 
 // Modifier
-  "KEY_MOD_LCTRL": 0x01
-  "KEY_MOD_LSHIFT": 0x02
-  "KEY_MOD_LALT": 0x04
-  "KEY_MOD_RCTRL": 0x10
-  "KEY_MOD_RSHIFT": 0x20
-  "KEY_MOD_RALT": 0x40
+
 */
 
 var keyMap = map[string]byte{
+
+	"KEY_MOD_LCTRL":  0x01,
+	"KEY_MOD_LSHIFT": 0x02,
+	"KEY_MOD_LALT":   0x04,
+	"KEY_MOD_RCTRL":  0x10,
+	"KEY_MOD_RSHIFT": 0x20,
+	"KEY_MOD_RALT":   0x40,
+
 	"KEY_UP":    0x52,
 	"KEY_DOWN":  0x51,
 	"KEY_RIGHT": 0x4f,
@@ -85,11 +88,16 @@ func (h *hid) SetKeys(keys []string) {
 
 	out := make([]byte, 8)
 
-	ptr := 2
+	modPtr := 0
+	keyPtr := 2
 	for _, v := range keys {
-		if ptr < 8 {
-			out[ptr] = keyMap[v]
-			ptr++
+		if strings.HasPrefix(v, "KEY_MOD_") {
+			out[modPtr] += keyMap[v]
+		} else if strings.HasPrefix(v, "KEY_") {
+			if keyPtr < 8 {
+				out[keyPtr] = keyMap[v]
+				keyPtr++
+			}
 		}
 	}
 

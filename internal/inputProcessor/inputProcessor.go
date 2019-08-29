@@ -128,5 +128,18 @@ func (i *inputProcessor) OutputJoystick(in *data.Joystick, out string) {
 		i.mist.SetJoystick1(in)
 	case "JOY2_AXES":
 		i.mist.SetJoystick2(in)
+	case "KEY_ARROWS":
+		if in.Up {
+			i.registerKey("KEY_UP")
+		}
+		if in.Down {
+			i.registerKey("KEY_DOWN")
+		}
+		if in.Left {
+			i.registerKey("KEY_LEFT")
+		}
+		if in.Right {
+			i.registerKey("KEY_RIGHT")
+		}
 	}
 }
