@@ -84,7 +84,7 @@ func (h *hid) Close() {
 }
 
 func (h *hid) SetKeys(keys []string) {
-	//logrus.WithField("keys", keys).Info("Setting HID keys")
+	logrus.WithField("keys", keys).Info("Setting HID keys")
 
 	out := make([]byte, 8)
 
@@ -105,6 +105,9 @@ func (h *hid) SetKeys(keys []string) {
 }
 
 func (h *hid) sendRaw(b []byte) error {
+
+	logrus.WithField("bytes", b).Info("Sending HID raw")
+
 	_, err := h.file.Write(b)
 	if err != nil {
 		logrus.WithError(err).Error("Error writing to hid")

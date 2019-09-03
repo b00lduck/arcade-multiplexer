@@ -1,6 +1,7 @@
 package inputProcessor
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/config"
@@ -42,8 +43,8 @@ func (i *inputProcessor) SetMappings(mappings []config.Mapping) {
 }
 
 func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
-	//fmt.Println(ms.String())
-	//fmt.Printf("\033[7A")
+	fmt.Println(ms.String())
+	fmt.Printf("\033[7A")
 
 	i.mutex.Lock()
 
@@ -80,7 +81,12 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 			i.RegisterButtonOrKey(ms.GlobalKeypad.WhiteLeft, v.Output, v.Autofire)
 		case "WHITE_RIGHT":
 			i.RegisterButtonOrKey(ms.GlobalKeypad.WhiteRight, v.Output, v.Autofire)
+		case "FLIPPER_LEFT":
+			i.RegisterButtonOrKey(ms.GlobalKeypad.FlipperLeft, v.Output, v.Autofire)
+		case "FLIPPER_RIGHT":
+			i.RegisterButtonOrKey(ms.GlobalKeypad.FlipperRight, v.Output, v.Autofire)
 		}
+
 	}
 
 	i.mist.SetJoystickButton(0, i.buttonStates[0])
