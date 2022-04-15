@@ -57,12 +57,19 @@ func (m *mistControl) LoadGame(game *config.Game, core *config.Core) {
 		logrus.WithError(err).Fatal("Error opening /dev/hidg0")
 	}
 	defer file.Close()
+
 	m.hid.WriteSequence(core.Load, core.Speed1, core.Speed2)
 
 	for i := 0; i < game.Index; i++ {
 		m.hid.WriteSequence([]string{"KEY_DOWN"}, core.Speed1, core.Speed2)
 	}
 	m.hid.WriteSequence([]string{"KEY_ENTER"}, core.Speed1, core.Speed2)
+
+	if game.Disks == 2 {
+		m.hid.WriteSequence([]string{"KEY_ENTER"}, core.Speed1, core.Speed2)
+		m.hid.WriteSequence([]string{"KEY_DOWN"}, core.Speed1, core.Speed2)
+		m.hid.WriteSequence([]string{"KEY_ENTER"}, core.Speed1, core.Speed2)
+	}
 
 	m.hid.WriteSequence(core.Run, core.Speed1, core.Speed2)
 

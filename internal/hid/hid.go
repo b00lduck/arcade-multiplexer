@@ -35,6 +35,8 @@ var keyMap = map[string]byte{
 	"KEY_SPACE": 0x2c,
 	"KEY_F1":    0x3a,
 	"KEY_F2":    0x3b,
+	"KEY_F3":    0x3c,
+	"KEY_F4":    0x3d,
 	"KEY_HOME":  0x4a,
 
 	"KEY_A": 0x04,

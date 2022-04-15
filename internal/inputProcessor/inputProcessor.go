@@ -2,6 +2,7 @@ package inputProcessor
 
 import (
 	"sync"
+	"fmt"
 
 	"github.com/b00lduck/arcade-multiplexer/internal/config"
 	"github.com/b00lduck/arcade-multiplexer/internal/data"
@@ -42,9 +43,10 @@ func (i *inputProcessor) SetMappings(mappings []config.Mapping) {
 }
 
 func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
-	//fmt.Println(ms.String())
-	//fmt.Printf("\033[7A")
 
+	fmt.Println(ms.String())
+	fmt.Printf("\033[7A")
+	
 	i.mutex.Lock()
 
 	i.buttonStates = make([]data.ButtonState, 4)
@@ -57,6 +59,24 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 			i.OutputJoystick(&ms.Player1Joystick, v.Output)
 		case "P2_JOY":
 			i.OutputJoystick(&ms.Player2Joystick, v.Output)
+
+		case "P1_JOY_DOWN":
+			i.RegisterButtonOrKey(ms.Player1Joystick.Down, v.Output, v.Autofire)
+		case "P1_JOY_LEFT":
+			i.RegisterButtonOrKey(ms.Player1Joystick.Left, v.Output, v.Autofire)
+		case "P1_JOY_UP":
+			i.RegisterButtonOrKey(ms.Player1Joystick.Up, v.Output, v.Autofire)
+		case "P1_JOY_RIGHT":
+			i.RegisterButtonOrKey(ms.Player1Joystick.Right, v.Output, v.Autofire)
+
+		case "P2_JOY_DOWN":
+			i.RegisterButtonOrKey(ms.Player2Joystick.Down, v.Output, v.Autofire)
+		case "P2_JOY_LEFT":
+			i.RegisterButtonOrKey(ms.Player2Joystick.Left, v.Output, v.Autofire)
+		case "P2_JOY_UP":
+			i.RegisterButtonOrKey(ms.Player2Joystick.Up, v.Output, v.Autofire)
+		case "P2_JOY_RIGHT":
+			i.RegisterButtonOrKey(ms.Player2Joystick.Right, v.Output, v.Autofire)
 
 		case "P1_RED":
 			i.RegisterButtonOrKey(ms.Player1Keypad.Red, v.Output, v.Autofire)
@@ -75,6 +95,11 @@ func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 			i.RegisterButtonOrKey(ms.Player2Keypad.Blue, v.Output, v.Autofire)
 		case "P2_GREEN":
 			i.RegisterButtonOrKey(ms.Player2Keypad.Green, v.Output, v.Autofire)
+
+		case "FLIPPER_LEFT":
+			i.RegisterButtonOrKey(ms.GlobalKeypad.FlipperLeft, v.Output, v.Autofire)
+		case "FLIPPER_RIGHT":
+			i.RegisterButtonOrKey(ms.GlobalKeypad.FlipperRight, v.Output, v.Autofire)
 
 		case "WHITE_LEFT":
 			i.RegisterButtonOrKey(ms.GlobalKeypad.WhiteLeft, v.Output, v.Autofire)

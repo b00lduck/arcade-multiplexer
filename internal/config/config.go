@@ -18,6 +18,7 @@ type Game struct {
 	Image    string    `yaml:"image"`
 	Index    int       `yaml:"index"`
 	Mappings []Mapping `yaml:"mappings"`
+	Disks    int	   `yaml:"disks"`
 }
 
 type Mapping struct {

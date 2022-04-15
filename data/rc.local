@@ -13,6 +13,6 @@
 
 /root/install_hid.sh
 cd /root/arcade-multiplexer
-nohup ./arcade-multiplexer &
+nohup ./arcade-multiplexer > /dev/null &
 
 exit 0
