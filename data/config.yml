@@ -209,6 +209,8 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1                  
+      - input: P2_RED
+        output: JOY2_BUTTON1                  
 
   - name: Giana Sisters
     core: Amiga
@@ -405,9 +407,13 @@ games:
       - input: WHITE_RIGHT
         output: KEY_F2
       - input: FLIPPER_LEFT
-        output: KEY_LSHIFT
+        output: KEY_MOD_LSHIFT
       - input: FLIPPER_RIGHT
-        output: KEY_RSHIFT
+        output: KEY_MOD_RSHIFT
+      - input: P1_GREEN
+        output: KEY_MOD_LSHIFT
+      - input: P2_GREEN
+        output: KEY_MOD_RSHIFT
       - input: P1_RED
         output: KEY_DOWN  
       - input: P1_BLUE
