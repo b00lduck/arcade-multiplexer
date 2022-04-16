@@ -494,9 +494,10 @@ cores:
       - KEY_F12
       - KEY_DOWN
       - KEY_ENTER
+      - KEY_WAIT_500
       - KEY_HOME
     run:
-      - KEY_WAIT_250
+      - KEY_WAIT_500
       - KEY_R
       - KEY_U
       - KEY_N
@@ -523,6 +524,7 @@ cores:
       - KEY_HOME
       - KEY_DOWN
       - KEY_ENTER
+      - KEY_WAIT_500
     run:
       - KEY_WAIT_250
       - KEY_RIGHT

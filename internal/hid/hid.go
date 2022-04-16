@@ -124,6 +124,7 @@ func (h *hid) WriteSequence(seq []string, speed1, speed2 uint64) error {
 			if err != nil {
 				logrus.WithError(err).Info("Wait failed")
 			}
+			logrus.WithField("ms", foo).Info("sleeping")
 			time.Sleep(time.Duration(foo) * time.Millisecond)
 		} else {
 
