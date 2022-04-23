@@ -4,8 +4,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/config"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
+
+	"arcade-multiplexer/internal/config"
 )
 
 type Hid interface {
@@ -39,7 +40,7 @@ func (m *mistControl) ChangeCore(newCore *config.Core) {
 
 	time.Sleep(1000 * time.Millisecond)
 
-	logrus.WithField("newCore", newCore).Info("Changing core")
+	log.Info().Interface("newCore", newCore).Msg("Changing core")
 
 	m.hid.WriteSequence(newCore.Enter, 1, 10)
 
@@ -48,13 +49,13 @@ func (m *mistControl) ChangeCore(newCore *config.Core) {
 
 func (m *mistControl) LoadGame(game *config.Game, core *config.Core) {
 
-	logrus.WithField("name", game.Name).
-		WithField("core", game.Core).
-		Info("Loading game")
+	log.Info().Str("name", game.Name).
+		Str("core", game.Core).
+		Msg("Loading game")
 
 	file, err := os.OpenFile("/dev/hidg0", os.O_WRONLY, os.ModeDevice)
 	if err != nil {
-		logrus.WithError(err).Fatal("Error opening /dev/hidg0")
+		log.Fatal().Err(err).Msg("Error opening /dev/hidg0")
 	}
 	defer file.Close()
 

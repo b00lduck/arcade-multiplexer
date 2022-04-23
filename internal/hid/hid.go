@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tarent/logrus"
+    "github.com/rs/zerolog/log"
 )
 
 /*
@@ -74,7 +74,7 @@ func NewHid() *hid {
 
 	file, err := os.OpenFile("/dev/hidg0", os.O_WRONLY, os.ModeDevice)
 	if err != nil {
-		logrus.WithError(err).Fatal("Error opening /dev/hidg0")
+		log.Fatal().Err(err).Msg("Error opening /dev/hidg0")
 	}
 	return &hid{
 		file: file}
@@ -86,7 +86,6 @@ func (h *hid) Close() {
 }
 
 func (h *hid) SetKeys(keys []string) {
-	//logrus.WithField("keys", keys).Info("Setting HID keys")
 
 	out := make([]byte, 8)
 
@@ -109,7 +108,7 @@ func (h *hid) SetKeys(keys []string) {
 func (h *hid) sendRaw(b []byte) error {
 	_, err := h.file.Write(b)
 	if err != nil {
-		logrus.WithError(err).Error("Error writing to hid")
+		log.Error().Err(err).Msg("Error writing to hid")
 		return err
 	}
 	return nil
@@ -117,14 +116,14 @@ func (h *hid) sendRaw(b []byte) error {
 
 func (h *hid) WriteSequence(seq []string, speed1, speed2 uint64) error {
 	for _, v := range seq {
-		logrus.WithField("key", v).Info("PRESS")
+		log.Info().Str("key", v).Msg("PRESS")
 
 		if strings.HasPrefix(v, "KEY_WAIT_") {
 			foo, err := strconv.Atoi(strings.Split(v, "KEY_WAIT_")[1])
 			if err != nil {
-				logrus.WithError(err).Info("Wait failed")
+				log.Info().Err(err).Msg("Wait failed")
 			}
-			logrus.WithField("ms", foo).Info("sleeping")
+			log.Info().Int("ms", foo).Msg("sleeping")
 			time.Sleep(time.Duration(foo) * time.Millisecond)
 		} else {
 

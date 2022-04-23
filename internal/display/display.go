@@ -9,8 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
-	"github.com/tarent/logrus"
+	"github.com/rs/zerolog/log"
+
+	"arcade-multiplexer/internal/framebuffer"
 )
 
 type display struct {
@@ -34,7 +35,7 @@ func LoadImage(filename string) (image.Image, error) {
 
 	f, err := os.Open("images/" + filename)
 	if err != nil {
-		logrus.WithError(err).WithField("filename", filename).Error("Could not load image")
+		log.Error().Err(err).Str("filename", filename).Msg("Could not load image")
 		return nil, err
 	}
 
@@ -51,7 +52,7 @@ func LoadImage(filename string) (image.Image, error) {
 	}
 
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not decode image")
+		log.Error().Err(err).Str("filename", filename).Msg("Could not decode image")
 	}
 
 	return img, nil

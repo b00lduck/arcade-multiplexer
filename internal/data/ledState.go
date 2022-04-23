@@ -1,6 +1,6 @@
 package data
 
-import "github.com/b00lduck/arcade-multiplexer/internal/config"
+import "arcade-multiplexer/internal/config"
 
 type LedState struct {
 	Player1Keypad PlayerKeypad

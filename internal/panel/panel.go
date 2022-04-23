@@ -3,7 +3,7 @@ package panel
 import (
 	"time"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"arcade-multiplexer/internal/data"
 
 	"github.com/jinzhu/copier"
 	"periph.io/x/periph/conn/i2c"

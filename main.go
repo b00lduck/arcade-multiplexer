@@ -6,19 +6,22 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/config"
-	"github.com/b00lduck/arcade-multiplexer/internal/data"
-	"github.com/b00lduck/arcade-multiplexer/internal/display"
-	"github.com/b00lduck/arcade-multiplexer/internal/framebuffer"
-	"github.com/b00lduck/arcade-multiplexer/internal/hid"
-	"github.com/b00lduck/arcade-multiplexer/internal/inputProcessor"
-	"github.com/b00lduck/arcade-multiplexer/internal/mist"
-	"github.com/b00lduck/arcade-multiplexer/internal/panel"
-	"github.com/b00lduck/arcade-multiplexer/internal/rotary"
-	"github.com/b00lduck/arcade-multiplexer/internal/ui"
-	"github.com/tarent/logrus"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/host"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+
+	"arcade-multiplexer/internal/config"
+	"arcade-multiplexer/internal/data"
+	"arcade-multiplexer/internal/display"
+	"arcade-multiplexer/internal/framebuffer"
+	"arcade-multiplexer/internal/hid"
+	"arcade-multiplexer/internal/inputProcessor"
+	"arcade-multiplexer/internal/mist"
+	"arcade-multiplexer/internal/panel"
+	"arcade-multiplexer/internal/rotary"
+	"arcade-multiplexer/internal/ui"
 )
 
 type Mist interface {
@@ -36,17 +39,19 @@ func main() {
 	quit := make(chan os.Signal, 2)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	// Initialize periph.io library
 	// see https://periph.io/project/library/
 	_, err := host.Init()
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not open initialize periph.io")
+		log.Fatal().Err(err).Msg("Could not open initialize periph.io")
 	}
 
 	// Open the first available I²C bus
 	bus, err := i2creg.Open("")
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not open i2c bus")
+		log.Fatal().Err(err).Msg("Could not open i2c bus")
 	}
 
 	// Initialize TFT framebuffer and display
@@ -56,7 +61,6 @@ func main() {
 	display.ShowImage("splash.jpg")
 
 	// Load game config from yml file
-
 	c := config.NewConfig()
 
 	// Initialize connection to MiST-interface board. This
@@ -79,7 +83,7 @@ func main() {
 	// Exit handler routine, triggered by signal (see above)
 	go func() {
 		<-quit
-		logrus.Info("Shutting down")
+		log.Info().Msg("Shutting down")
 		//mist.SetPower(false)
 		// give some time to shut down the power pin via i2c
 		//time.Sleep(500 * time.Millisecond)

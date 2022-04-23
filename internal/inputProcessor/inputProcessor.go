@@ -4,8 +4,8 @@ import (
 	"sync"
 	"fmt"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/config"
-	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"arcade-multiplexer/internal/config"
+	"arcade-multiplexer/internal/data"
 )
 
 type Mist interface {
