@@ -5,7 +5,7 @@ set -e
 GOARCH=arm GOOS=linux go build .
 
 set +e
-ssh root@arcade "killall -q ./arcade-multiplexer"
+ssh root@arcade "pkill -f './arcade-multiplexer'"
 set -e
 
 ssh root@arcade "mkdir -p /root/arcade-multiplexer/images"

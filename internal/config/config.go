@@ -3,8 +3,9 @@ package config
 import (
 	"io/ioutil"
 
-	"github.com/tarent/logrus"
 	"gopkg.in/yaml.v2"
+
+    "github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -18,6 +19,7 @@ type Game struct {
 	Image    string    `yaml:"image"`
 	Index    int       `yaml:"index"`
 	Mappings []Mapping `yaml:"mappings"`
+	Disks    int	   `yaml:"disks"`
 }
 
 type Mapping struct {
@@ -41,11 +43,11 @@ func NewConfig() *Config {
 	c := Config{}
 	yamlFile, err := ioutil.ReadFile("config.yml")
 	if err != nil {
-		logrus.WithError(err).Fatal("Error reading yaml file")
+		log.Fatal().Err(err).Msg("Error reading yaml file")
 	}
 	err = yaml.Unmarshal(yamlFile, &c)
 	if err != nil {
-		logrus.WithError(err).Fatal("Error parsing yaml file")
+		log.Fatal().Err(err).Msg("Error parsing yaml file")
 	}
 	return &c
 }
@@ -56,6 +58,6 @@ func (c *Config) GetCoreByName(name string) *Core {
 			return &v
 		}
 	}
-	logrus.WithField("name", name).Fatal("Unknown core")
+	log.Fatal().Str("name", name).Msg("Unknown core")
 	return nil
 }

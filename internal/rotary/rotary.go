@@ -5,9 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tarent/logrus"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
+
+	"github.com/rs/zerolog/log"
 )
 
 type rotary struct {
@@ -96,11 +97,11 @@ func (o *rotary) runEvaluation() {
 
 			if o.currentPosi != posi/4 {
 				o.currentPosi = posi / 4
-				logrus.Info(o.currentPosi)
+				log.Info().Int("pos", o.currentPosi).Msg("Rotary pos")
 				o.chooseCallback(uint32(o.currentPosi))
 			}
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 	}
 }
 

@@ -1,9 +1,11 @@
 package ui
 
 import (
-	"github.com/b00lduck/arcade-multiplexer/internal/config"
-	"github.com/b00lduck/arcade-multiplexer/internal/data"
-	"github.com/tarent/logrus"
+
+	"github.com/rs/zerolog/log"
+
+	"arcade-multiplexer/internal/config"
+	"arcade-multiplexer/internal/data"
 )
 
 type Display interface {
@@ -55,7 +57,7 @@ func (u *ui) startGame(game config.Game) {
 	//oldCore := cores.CoreFromString(u.oldGame.Core)
 	u.oldGame = game
 
-	logrus.WithField("game", game).Info("Starting game")
+	log.Info().Interface("game", game).Msg("Starting game")
 
 	u.panel.SetLeds(data.LedStateByMapping(game.Mappings))
 	if game.Image != "" {
@@ -70,7 +72,7 @@ func (u *ui) startGame(game config.Game) {
 }
 
 func (u *ui) selectGame(game config.Game) {
-	logrus.WithField("game", game).Info("Selected game")
+	log.Info().Interface("game", game).Msg("Selected game")
 	if game.Image != "" {
 		u.display.ShowImage(game.Image)
 	}

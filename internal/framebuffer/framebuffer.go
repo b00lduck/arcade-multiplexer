@@ -7,7 +7,7 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/tarent/logrus"
+    "github.com/rs/zerolog/log"
 )
 
 const resx = 320
@@ -26,13 +26,13 @@ func NewFramebuffer(device string) *Framebuffer {
 
 	file, err := os.OpenFile(device, os.O_RDWR, 0)
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not open framebuffer")
+		log.Fatal().Err(err).Msg("Could not open framebuffer")
 	}
 
 	data, err := syscall.Mmap(int(file.Fd()), 0, screensize,
 		syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not open framebuffer")
+		log.Fatal().Err(err).Msg("Could not open framebuffer")
 	}
 
 	return &Framebuffer{

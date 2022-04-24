@@ -43,13 +43,15 @@
 # JOY2_BUTTON1
 # JOY2_BUTTON2
 # KEY_SPACE
-# KEY_ESCAPE
+# KEY_ESC
 # KEY_LSHIFT
 # KEY_RSHIFT
 # KEY_1
 # KEY_2
 # KEY_3
 # KEY_4
+# KEY_F1
+# KEY_F2
 
 games:
 
@@ -60,9 +62,6 @@ games:
     mappings:
       - input: P1_JOY
         output: JOY2_AXES
-      - input: P1_YELLOW
-        output: JOY2_BUTTON1
-        autofire: true        
       - input: P1_RED
         output: JOY2_BUTTON1
         
@@ -137,7 +136,7 @@ games:
       - input: P1_BLUE
         output: KEY_SPACE  
       - input: WHITE_LEFT
-        output: KEY_ESCAPE
+        output: KEY_ESC
       - input: P2_RED
         output: JOY2_BUTTON1          
 
@@ -157,7 +156,7 @@ games:
       - input: P1_BLUE
         output: KEY_SPACE  
       - input: WHITE_LEFT
-        output: KEY_ESCAPE
+        output: KEY_ESC
       - input: P2_RED
         output: JOY2_BUTTON1  
 
@@ -209,6 +208,12 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1                  
+      - input: P2_RED
+        output: JOY2_BUTTON1
+      - input: WHITE_LEFT
+        output: KEY_M
+      - input: WHITE_RIGHT
+        output: KEY_T
 
   - name: Giana Sisters
     core: Amiga
@@ -219,10 +224,8 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
-      - input: WHITE_LEFT
-        output: KEY_1                        
-      - input: WHITE_LEFT
-        output: KEY_2
+      - input: P2_RED
+        output: WHITE_LEFT
 
   - name: International Karate +
     core: Amiga
@@ -237,6 +240,14 @@ games:
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1
+      - input: WHITE_LEFT
+        output: KEY_F1    
+      - input: WHITE_RIGHT
+        output: KEY_F2
+      - input: P1_BLUE
+        output: KEY_T    
+      - input: P2_BLUE
+        output: KEY_T
 
   - name: Jumping Jackson
     core: Amiga
@@ -246,7 +257,9 @@ games:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
-        output: JOY1_BUTTON1            
+        output: JOY1_BUTTON1
+      - input: WHITE_LEFT
+        output: JOY2_BUTTON1     
 
   - name: Katakis
     core: Amiga
@@ -257,6 +270,9 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
+      - input: P1_YELLOW
+        output: JOY1_BUTTON1
+        autofire: true
 
   - name: Lotus Esprit Turbo Challenge
     core: Amiga
@@ -284,7 +300,9 @@ games:
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
-        output: JOY2_BUTTON1        
+        output: JOY2_BUTTON1    
+      - input: WHITE_LEFT
+        output: KEY_ENTER      
 
   - name: Lotus 3 - The ultimate challenge
     core: Amiga
@@ -340,11 +358,7 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
-      - input: P2_JOY
-        output: JOY2_AXES
-      - input: P2_RED
-        output: JOY2_BUTTON1               
-
+ 
   - name: Badlands
     core: Amiga
     index: 25
@@ -358,6 +372,10 @@ games:
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1    
+      - input: WHITE_LEFT
+        output: KEY_F3
+      - input: WHITE_RIGHT
+        output: KEY_F4
 
   - name: Micro Machines
     core: Amiga
@@ -393,6 +411,8 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1  
+      - input: WHITE_LEFT
+        output: JOY2_BUTTON1  
 
   - name: Pinball Dreams
     core: Amiga
@@ -401,19 +421,25 @@ games:
     image: pinball_dreams.jpg
     mappings:
       - input: WHITE_LEFT
-        output: KEY_F1
+        output: JOY2_BUTTON1
       - input: WHITE_RIGHT
+        output: KEY_ESC
+      - input: P2_RED
+        output: KEY_F1
+      - input: P2_YELLOW
         output: KEY_F2
+      - input: P2_BLUE
+        output: KEY_F3
+      - input: P2_GREEN
+        output: KEY_F4
       - input: FLIPPER_LEFT
         output: KEY_MOD_LSHIFT
       - input: FLIPPER_RIGHT
         output: KEY_MOD_RSHIFT
-      - input: P1_RED
+      - input: P2_JOY_DOWN
         output: KEY_DOWN  
-      - input: P1_BLUE
+      - input: P1_JOY_UP
         output: KEY_SPACE  
-      - input: P2_RED
-        output: JOY2_BUTTON1     
 
   - name: Rick Dangerous
     core: Amiga
@@ -468,9 +494,10 @@ cores:
       - KEY_F12
       - KEY_DOWN
       - KEY_ENTER
+      - KEY_WAIT_500
       - KEY_HOME
     run:
-      - KEY_WAIT_250
+      - KEY_WAIT_500
       - KEY_R
       - KEY_U
       - KEY_N
@@ -497,6 +524,7 @@ cores:
       - KEY_HOME
       - KEY_DOWN
       - KEY_ENTER
+      - KEY_WAIT_500
     run:
       - KEY_WAIT_250
       - KEY_RIGHT

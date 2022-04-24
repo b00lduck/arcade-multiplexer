@@ -3,7 +3,7 @@ package mist
 import (
 	"time"
 
-	"github.com/b00lduck/arcade-multiplexer/internal/data"
+	"arcade-multiplexer/internal/data"
 
 	"periph.io/x/periph/conn/i2c"
 )
