@@ -1,11 +1,11 @@
 package ui
 
 import (
-
 	"github.com/rs/zerolog/log"
 
 	"arcade-multiplexer/internal/config"
 	"arcade-multiplexer/internal/data"
+	"arcade-multiplexer/internal/framebuffer"
 )
 
 type Display interface {
@@ -26,7 +26,7 @@ type MistControl interface {
 }
 
 type ui struct {
-	display        Display
+	framebuffer    *framebuffer.DisplayFramebuffer
 	panel          Panel
 	config         *config.Config
 	oldGame        config.Game
@@ -34,9 +34,9 @@ type ui struct {
 	mistControl    MistControl
 }
 
-func NewUi(c *config.Config, display Display, panel Panel, ip InputProcessor, mistControl MistControl) *ui {
+func NewUi(c *config.Config, framebuffer *framebuffer.DisplayFramebuffer, panel Panel, ip InputProcessor, mistControl MistControl) *ui {
 	return &ui{
-		display:        display,
+		framebuffer:    framebuffer,
 		panel:          panel,
 		config:         c,
 		oldGame:        config.Game{},
@@ -61,7 +61,7 @@ func (u *ui) startGame(game config.Game) {
 
 	u.panel.SetLeds(data.LedStateByMapping(game.Mappings))
 	if game.Image != "" {
-		u.display.ShowImage(game.Image)
+		u.framebuffer.ShowImage(game.Image)
 	}
 	u.inputProcessor.SetMappings(game.Mappings)
 
@@ -74,6 +74,6 @@ func (u *ui) startGame(game config.Game) {
 func (u *ui) selectGame(game config.Game) {
 	log.Info().Interface("game", game).Msg("Selected game")
 	if game.Image != "" {
-		u.display.ShowImage(game.Image)
+		u.framebuffer.ShowImage(game.Image)
 	}
 }
