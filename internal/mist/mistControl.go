@@ -36,6 +36,7 @@ func NewMistControl(h Hid, mistDigital MistDigital) *mistControl {
 func (m *mistControl) ChangeCore(newCore *config.Core) {
 
 	if newCore == nil {
+		log.Warn().Msg("new core is nil")
 		return
 	}
 
@@ -65,8 +66,10 @@ func (m *mistControl) LoadGame(game *config.Game, core *config.Core, sameCore bo
 	defer file.Close()
 
 	if sameCore {
+		log.Info().Msg("same core")
 		m.hid.WriteSequence(core.LoadSameCore, core.Speed1, core.Speed2)
 	} else {
+		log.Info().Msg("other core")
 		m.hid.WriteSequence(core.Load, core.Speed1, core.Speed2)
 	}
 

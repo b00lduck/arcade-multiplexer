@@ -83,7 +83,7 @@ func (o *rotary) runAcquisition() {
 }
 
 func (o *rotary) runEvaluation() {
-	posi := 1
+	posi := 0
 
 	for {
 		d := o.fetchDelta()

@@ -57,7 +57,6 @@ func (u *ui) SelectGameById(id uint32) {
 func (u *ui) startGame(game config.Game) {
 
 	//oldCore := cores.CoreFromString(u.oldGame.Core)
-	u.oldGame = game
 
 	log.Info().Interface("game", game).Msg("Starting game")
 
@@ -68,13 +67,16 @@ func (u *ui) startGame(game config.Game) {
 	u.inputProcessor.SetMappings(game.Mappings)
 
 	newCore := u.config.GetCoreByName(game.Core)
+
+	log.Info().Str("oldCore", u.oldGame.Core).Str("newCore", game.Core).Msg("cores")
+
 	if u.oldGame.Core != game.Core {
 		u.mistControl.ChangeCore(newCore)
 		u.mistControl.LoadGame(&game, newCore, false)
 	} else {
 		u.mistControl.LoadGame(&game, newCore, true)
 	}
-
+	u.oldGame = game
 }
 
 func (u *ui) selectGame(game config.Game) {
