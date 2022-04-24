@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-    "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -19,7 +19,7 @@ type Game struct {
 	Image    string    `yaml:"image"`
 	Index    int       `yaml:"index"`
 	Mappings []Mapping `yaml:"mappings"`
-	Disks    int	   `yaml:"disks"`
+	Disks    int       `yaml:"disks"`
 }
 
 type Mapping struct {
@@ -29,14 +29,15 @@ type Mapping struct {
 }
 
 type Core struct {
-	Name      string   `yaml:"name"`
-	Enter     []string `yaml:"enter"`
-	Exit      []string `yaml:"exit"`
-	Load      []string `yaml:"load"`
-	Run       []string `yaml:"run"`
-	BootSleep uint64   `yaml:"bootSleep"`
-	Speed1    uint64   `yaml:"speed1"`
-	Speed2    uint64   `yaml:"speed2"`
+	Name  string   `yaml:"name"`
+	Enter []string `yaml:"enter"`
+	//	Exit         []string `yaml:"exit"`
+	Load         []string `yaml:"load"`
+	LoadSameCore []string `yaml:"loadSameCore"`
+	Run          []string `yaml:"run"`
+	BootSleep    uint64   `yaml:"bootSleep"`
+	Speed1       uint64   `yaml:"speed1"`
+	Speed2       uint64   `yaml:"speed2"`
 }
 
 func NewConfig() *Config {

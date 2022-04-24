@@ -484,18 +484,17 @@ cores:
     enter:
       - KEY_DOWN
       - KEY_ENTER
-    exit:
-      - KEY_F12
-      - KEY_RIGHT
-      - KEY_ENTER
-      - KEY_ENTER
-      - KEY_HOME
     load:
       - KEY_F12
       - KEY_DOWN
       - KEY_ENTER
       - KEY_WAIT_500
       - KEY_HOME
+    loadSameCore:
+      - KEY_F12
+      - KEY_ENTER
+      - KEY_ENTER
+      - KEY_WAIT_500       
     run:
       - KEY_WAIT_500
       - KEY_R
@@ -511,13 +510,6 @@ cores:
       - KEY_DOWN
       - KEY_DOWN
       - KEY_ENTER
-    exit: 
-      - KEY_F12
-      - KEY_RIGHT
-      - KEY_RIGHT
-      - KEY_ENTER
-      - KEY_ENTER
-      - KEY_HOME
     load:
       - KEY_F12
       - KEY_ENTER
@@ -525,6 +517,11 @@ cores:
       - KEY_DOWN
       - KEY_ENTER
       - KEY_WAIT_500
+    loadSameCore:
+      - KEY_F12
+      - KEY_ENTER
+      - KEY_ENTER
+      - KEY_WAIT_500      
     run:
       - KEY_WAIT_250
       - KEY_RIGHT

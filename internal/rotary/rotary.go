@@ -52,12 +52,13 @@ func (o *rotary) Run() {
 
 func (o *rotary) runAcquisition() {
 	encLast := 1
+	o.oldButtonState = bool(o.btn.Read())
 	for {
 
 		btnRead := bool(o.btn.Read())
 		if btnRead != o.oldButtonState {
 			o.oldButtonState = btnRead
-			if btnRead == false {
+			if !btnRead {
 				o.clickCallback(uint32(o.currentPosi))
 			}
 		}
@@ -82,7 +83,7 @@ func (o *rotary) runAcquisition() {
 }
 
 func (o *rotary) runEvaluation() {
-	posi := 0
+	posi := 1
 
 	for {
 		d := o.fetchDelta()

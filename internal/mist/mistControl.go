@@ -23,6 +23,11 @@ type mistControl struct {
 }
 
 func NewMistControl(h Hid, mistDigital MistDigital) *mistControl {
+
+	mistDigital.SetResetButton(true)
+	time.Sleep(50 * time.Millisecond)
+	mistDigital.SetResetButton(false)
+
 	return &mistControl{
 		hid:         h,
 		mistDigital: mistDigital}
@@ -47,7 +52,7 @@ func (m *mistControl) ChangeCore(newCore *config.Core) {
 	time.Sleep(time.Duration(newCore.BootSleep) * time.Millisecond)
 }
 
-func (m *mistControl) LoadGame(game *config.Game, core *config.Core) {
+func (m *mistControl) LoadGame(game *config.Game, core *config.Core, sameCore bool) {
 
 	log.Info().Str("name", game.Name).
 		Str("core", game.Core).
@@ -59,7 +64,11 @@ func (m *mistControl) LoadGame(game *config.Game, core *config.Core) {
 	}
 	defer file.Close()
 
-	m.hid.WriteSequence(core.Load, core.Speed1, core.Speed2)
+	if sameCore {
+		m.hid.WriteSequence(core.LoadSameCore, core.Speed1, core.Speed2)
+	} else {
+		m.hid.WriteSequence(core.Load, core.Speed1, core.Speed2)
+	}
 
 	for i := 0; i < game.Index; i++ {
 		m.hid.WriteSequence([]string{"KEY_DOWN"}, core.Speed1, core.Speed2)

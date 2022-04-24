@@ -1,7 +1,6 @@
 package framebuffer
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"syscall"
@@ -21,7 +20,7 @@ type DisplayFramebuffer struct {
 
 func NewDisplayFramebuffer(device string) *DisplayFramebuffer {
 
-	fmt.Printf("initializing DisplayFramebuffer on device %s\n", device)
+	log.Info().Str("device", device).Msg("initializing DisplayFramebuffer")
 
 	file, err := os.OpenFile(device, os.O_RDWR, 0)
 	if err != nil {

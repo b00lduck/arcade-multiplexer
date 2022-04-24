@@ -22,7 +22,7 @@ type InputProcessor interface {
 
 type MistControl interface {
 	ChangeCore(*config.Core)
-	LoadGame(*config.Game, *config.Core)
+	LoadGame(*config.Game, *config.Core, bool)
 }
 
 type ui struct {
@@ -36,10 +36,12 @@ type ui struct {
 
 func NewUi(c *config.Config, framebuffer *framebuffer.DisplayFramebuffer, panel Panel, ip InputProcessor, mistControl MistControl) *ui {
 	return &ui{
-		framebuffer:    framebuffer,
-		panel:          panel,
-		config:         c,
-		oldGame:        config.Game{},
+		framebuffer: framebuffer,
+		panel:       panel,
+		config:      c,
+		oldGame: config.Game{
+			Core: "none",
+		},
 		inputProcessor: ip,
 		mistControl:    mistControl}
 }
@@ -66,8 +68,12 @@ func (u *ui) startGame(game config.Game) {
 	u.inputProcessor.SetMappings(game.Mappings)
 
 	newCore := u.config.GetCoreByName(game.Core)
-	u.mistControl.ChangeCore(newCore)
-	u.mistControl.LoadGame(&game, newCore)
+	if u.oldGame.Core != game.Core {
+		u.mistControl.ChangeCore(newCore)
+		u.mistControl.LoadGame(&game, newCore, false)
+	} else {
+		u.mistControl.LoadGame(&game, newCore, true)
+	}
 
 }
 

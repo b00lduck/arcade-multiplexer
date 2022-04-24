@@ -79,7 +79,6 @@ func (o *mistDigital) Run() {
 		o.changeChipBit(0, 4, !o.AutoFired(&o.buttonStates[2]))
 		o.changeChipBit(0, 5, !o.AutoFired(&o.buttonStates[3]))
 
-		//logrus.Info(fmt.Sprintf("%08b %08bb", o.writtenStates[0], o.writtenStates[1]))
 		for k, v := range o.chips {
 			r := []byte{0}
 			v.Tx([]byte{o.writtenStates[k]}, r)
