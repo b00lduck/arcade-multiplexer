@@ -8,9 +8,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const resx = 320
-const resy = 480
-const depth = 16
+const resx = 480
+const resy = 640
+const depth = 32
 const screensize = resx * resy * depth / 8
 
 type DisplayFramebuffer struct {

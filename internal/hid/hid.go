@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -106,6 +107,24 @@ func (h *hid) SetKeys(keys []string) {
 }
 
 func (h *hid) sendRaw(b []byte) error {
+
+	// retry 100 times if error
+	for i := 0; i < 100; i++ {
+		err := h.sendRawOnce(b)
+		if err == nil {
+			time.Sleep(100 * time.Millisecond)
+			return nil
+		}
+	}
+
+	err := errors.New("Error writing to hid, giving up")
+	log.Error().Err(err).Msg("Error writing to hid, giving up")
+
+	return err
+}
+
+
+func (h *hid) sendRawOnce(b []byte) error {
 
 	_, err := h.file.Write(b)
 	if err != nil {

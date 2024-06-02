@@ -24,7 +24,7 @@ func main() {
 
 	fb := framebuffer.NewConverterFramebuffer()
 
-	draw.Draw(fb, fb.Bounds(), img, image.ZP, draw.Src)
+	draw.Draw(fb, fb.Bounds(), img, image.Point{}, draw.Src)
 
 	fb.Dump(source + ".565.data")
 

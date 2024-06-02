@@ -2,7 +2,7 @@
 
 set -e
 
-GOARCH=arm GOOS=linux go build ./cmd/arcade-multiplexer/
+GOARCH=arm GOARM=6 GOOS=linux go build ./cmd/arcade-multiplexer/
 
 set +e
 ssh root@arcade "pkill -f './arcade-multiplexer'"

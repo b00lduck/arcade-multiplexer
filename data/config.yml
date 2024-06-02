@@ -524,8 +524,8 @@ cores:
       - KEY_U
       - KEY_N
       - KEY_ENTER
-    bootSleep: 4000
-    speed1: 30
+    bootSleep: 10000
+    speed1: 50
     speed2: 50
 
   - name: Amiga
@@ -537,7 +537,6 @@ cores:
       - KEY_F12
       - KEY_ENTER
       - KEY_HOME
-      - KEY_DOWN
       - KEY_ENTER
       - KEY_WAIT_500
     loadSameCore:
@@ -555,8 +554,8 @@ cores:
       - KEY_ENTER
       - KEY_UP
       - KEY_ENTER
-    bootSleep: 11500
-    speed1: 30
+    bootSleep: 15000
+    speed1: 50
     speed2: 50
 
  

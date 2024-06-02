@@ -43,8 +43,7 @@ func (m *mistControl) ChangeCore(newCore *config.Core) {
 	m.mistDigital.SetResetButton(true)
 	time.Sleep(50 * time.Millisecond)
 	m.mistDigital.SetResetButton(false)
-
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 
 	log.Info().Interface("newCore", newCore).Msg("Changing core")
 

@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Initialize TFT framebuffer and display
-	fb := framebuffer.NewDisplayFramebuffer("/dev/fb1")
+	fb := framebuffer.NewDisplayFramebuffer("/dev/fb0")
 	defer fb.Close()
 
 	// Load game config from yml file
