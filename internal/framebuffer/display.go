@@ -1,7 +1,9 @@
 package framebuffer
 
 import (
-	"io"
+	"arcade-multiplexer/internal/converter"
+	"image"
+	"image/draw"
 	"os"
 	"syscall"
 
@@ -11,11 +13,12 @@ import (
 const resx = 480
 const resy = 640
 const depth = 32
-const screensize = resx * resy * depth / 8
+const stride = resx * depth / 8
+const screensize = resy * stride
 
 type DisplayFramebuffer struct {
+	PixelFormat
 	file *os.File
-	data []byte
 }
 
 func NewDisplayFramebuffer(device string) *DisplayFramebuffer {
@@ -32,33 +35,26 @@ func NewDisplayFramebuffer(device string) *DisplayFramebuffer {
 		log.Fatal().Err(err).Msg("Could not open DisplayFramebuffer")
 	}
 	return &DisplayFramebuffer{
+		PixelFormat: PixelFormat{
+			data: data,
+		},
 		file: file,
-		data: data}
-
+	}
 }
 
 func (f *DisplayFramebuffer) Close() {
 	f.file.Close()
 }
 
-func (f *DisplayFramebuffer) ShowImage(image string) {
+func (f *DisplayFramebuffer) ShowImage(i string) {
 
-	filename := "images/" + image + ".565.data"
+	filename := "images/" + i
 
-	s, err := os.Open(filename)
+	img, err := converter.LoadImage(filename)
 	if err != nil {
 		log.Error().Err(err).Str("filename", filename).Msg("Could not load image")
 		return
 	}
-	defer s.Close()
 
-	_, err = io.ReadFull(s, f.data)
-
-	if err != nil {
-		if err != io.EOF {
-			log.Error().Err(err).Str("filename", filename).Msg("error reading image data")
-			return
-		}
-	}
-
+	draw.Draw(f, f.Bounds(), img, image.Point{}, draw.Src)
 }

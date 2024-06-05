@@ -26,6 +26,6 @@ func main() {
 
 	draw.Draw(fb, fb.Bounds(), img, image.Point{}, draw.Src)
 
-	fb.Dump(source + ".565.data")
+	fb.Dump(source + ".argb32.data")
 
 }
