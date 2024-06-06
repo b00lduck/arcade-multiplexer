@@ -8,5 +8,3 @@ scp data/rc.local root@arcade:/etc/rc.local
 ssh root@arcade "chmod +x /etc/rc.local"
 ssh root@arcade "systemctl disable --now getty@tty0"
 ssh root@arcade "reboot"
-
-
