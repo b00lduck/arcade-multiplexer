@@ -1,0 +1,19 @@
+FROM debian
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get -y install git bc bison flex libssl-dev make libc6-dev libncurses5-dev crossbuild-essential-armhf kmod
+
+WORKDIR /
+
+RUN git clone --depth=1 https://github.com/raspberrypi/linux
+
+WORKDIR /linux
+
+ENV KERNEL=kernel
+
+ADD entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+
