@@ -1,6 +1,7 @@
 #!/bin/bash
 
-scp data/config.txt root@arcade:/boot/config.txt
+scp data/config.txt root@arcade:/boot/firmware/config.txt
+#scp data/cmdline.txt root@arcade:/boot/firmware/cmdline.txt
 scp data/modules root@arcade:/etc/modules
 scp data/install_hid.sh root@arcade:/root/install_hid.sh
 ssh root@arcade "chmod +x /root/install_hid.sh"

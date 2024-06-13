@@ -1,25 +1,20 @@
 package framebuffer
 
 import (
-	"arcade-multiplexer/internal/converter"
 	"image"
-	"image/draw"
 	"os"
 	"syscall"
 
+	"github.com/jmigpin/editor/util/imageutil"
 	"github.com/rs/zerolog/log"
 )
 
-const resx = 480
-const resy = 640
-const depth = 32
-const stride = resx * depth / 8
-const screensize = resy * stride
-
 type DisplayFramebuffer struct {
-	PixelFormat
+	imageutil.BGRA
 	file *os.File
 }
+
+const BPP = 4 // Bytes per pixel
 
 func NewDisplayFramebuffer(device string) *DisplayFramebuffer {
 
@@ -29,15 +24,22 @@ func NewDisplayFramebuffer(device string) *DisplayFramebuffer {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Could not open DisplayFramebuffer")
 	}
-	data, err := syscall.Mmap(int(file.Fd()), 0, screensize,
+
+	width := 608
+	height := 1024
+	bufferSize := width * height * BPP
+
+	data, err := syscall.Mmap(int(file.Fd()), 0, bufferSize,
 		syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Could not open DisplayFramebuffer")
 	}
+
+	image := imageutil.NewBGRA(&image.Rectangle{image.Point{}, image.Point{width, height}})
+	image.Pix = data
+
 	return &DisplayFramebuffer{
-		PixelFormat: PixelFormat{
-			data: data,
-		},
+		BGRA: *image,
 		file: file,
 	}
 }
@@ -46,15 +48,39 @@ func (f *DisplayFramebuffer) Close() {
 	f.file.Close()
 }
 
-func (f *DisplayFramebuffer) ShowImage(i string) {
-
-	filename := "images/" + i
-
-	img, err := converter.LoadImage(filename)
-	if err != nil {
-		log.Error().Err(err).Str("filename", filename).Msg("Could not load image")
-		return
+func (f *DisplayFramebuffer) Clear() {
+	for i := range f.Pix {
+		f.Pix[i] = 0
 	}
+}
 
-	draw.Draw(f, f.Bounds(), img, image.Point{}, draw.Src)
+/**
+ * Blit (Block image ttransfer) copies the contents of the src image to the framebuffer
+ * at the specified x and y coordinates.
+ */
+func (f *DisplayFramebuffer) Blit(x, y int, src *ResizedImage) {
+	dst := &f.BGRA
+	dstPtr := x*BPP + y*dst.Stride
+	srcEnd := src.Stride * src.Rect.Dy()
+	sourceWidthBytesMinusOne := src.Stride - 1
+	for srcPtr := 0; srcPtr < srcEnd; srcPtr += src.Stride {
+		copy(dst.Pix[dstPtr:], src.Pix[srcPtr:srcPtr+sourceWidthBytesMinusOne])
+		dstPtr += dst.Stride
+	}
+}
+
+/**
+ * BlitSrcWindow copies a window of the src image to the framebuffer
+ * at the specified x and y coordinates.
+ */
+func (f *DisplayFramebuffer) BlitSrcWindow(x, y, sx, sy, sw, sh int, src *ResizedImage) {
+	dst := &f.BGRA
+	dstPtr := x*BPP + y*dst.Stride
+	srcStart := sx*BPP + sy*src.Stride
+	srcEnd := srcStart + src.Stride*sh
+	sourceWidthBytesMinusOne := sw*BPP - 1
+	for srcPtr := srcStart; srcPtr < srcEnd; srcPtr += src.Stride {
+		copy(dst.Pix[dstPtr:], src.Pix[srcPtr:srcPtr+sourceWidthBytesMinusOne])
+		dstPtr += dst.Stride
+	}
 }

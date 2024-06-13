@@ -6,6 +6,7 @@ import (
 	"arcade-multiplexer/internal/data"
 
 	"github.com/jinzhu/copier"
+	"github.com/rs/zerolog/log"
 	"periph.io/x/periph/conn/i2c"
 )
 
@@ -23,6 +24,8 @@ type panel struct {
 
 	matrixState    data.MatrixState
 	inputProcessor InputProcessor
+
+	PanelUpdates chan data.MatrixState
 }
 
 /*
@@ -30,11 +33,11 @@ type panel struct {
 	Chip 1
 	------
 	0 O LED white left
-	1 O LED P1 green
-	2 O LED P1 blue
+	1 O LED P1 blue
+	2 O LED P1 green
 	3 O LED P1 yellow
-	4 O LED P2 green
-	5 O LED P2 blue
+	4 O LED P2 blue
+	5 O LED white right
 	6 O LED P2 yellow
 	7 O LED P2 red
 
@@ -47,7 +50,7 @@ type panel struct {
 	4 I Column 4
 	5
 	6
-	7 O LED white right
+	7 O LED P2 green
 
 
 	Chip 3
@@ -81,7 +84,6 @@ func NewPanel(bus i2c.Bus, processor InputProcessor) *panel {
 		writtenStates:  []uint8{0xff, 0xff, 0xff},
 		readStates:     []uint8{0xff, 0xff, 0xff},
 		inputProcessor: processor}
-
 }
 
 func (o *panel) Run() {
@@ -102,6 +104,11 @@ func (o *panel) Run() {
 		if newMatrix.Changed(o.matrixState) {
 			o.matrixState = newMatrix
 			o.inputProcessor.ProcessMatrix(o.matrixState)
+			select {
+			case o.PanelUpdates <- o.matrixState:
+			default:
+				log.Warn().Msg("Panel update message dropped")
+			}
 		}
 
 		time.Sleep(1000 * time.Microsecond)
@@ -169,19 +176,18 @@ func (o *panel) selectNextRow() {
 }
 
 func (o *panel) SetLeds(leds data.LedState) {
-
 	o.changeChipBit(0, 0, leds.GlobalKeypad.WhiteLeft)
-	o.changeChipBit(0, 1, leds.Player1Keypad.Green)
-	o.changeChipBit(0, 2, leds.Player1Keypad.Blue)
+	o.changeChipBit(0, 1, leds.Player1Keypad.Blue)
+	o.changeChipBit(0, 2, leds.Player1Keypad.Green)
 	o.changeChipBit(0, 3, leds.Player1Keypad.Yellow)
 
-	o.changeChipBit(0, 4, leds.Player2Keypad.Green)
-	o.changeChipBit(0, 5, leds.Player2Keypad.Blue)
+	o.changeChipBit(0, 4, leds.Player2Keypad.Blue)
+	o.changeChipBit(0, 5, leds.GlobalKeypad.WhiteRight)
 	o.changeChipBit(0, 6, leds.Player2Keypad.Yellow)
 	o.changeChipBit(0, 7, leds.Player2Keypad.Red)
 
 	o.changeChipBit(1, 0, leds.Player1Keypad.Red)
-	o.changeChipBit(1, 7, leds.GlobalKeypad.WhiteRight)
+	o.changeChipBit(1, 7, leds.Player2Keypad.Green)
 }
 
 func (o *panel) LedsOff() {

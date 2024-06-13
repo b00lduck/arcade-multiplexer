@@ -16,6 +16,7 @@ import (
 	"arcade-multiplexer/internal/data"
 	"arcade-multiplexer/internal/framebuffer"
 	"arcade-multiplexer/internal/hid"
+	"arcade-multiplexer/internal/imageCache"
 	"arcade-multiplexer/internal/inputProcessor"
 	"arcade-multiplexer/internal/mist"
 	"arcade-multiplexer/internal/panel"
@@ -53,12 +54,12 @@ func main() {
 		log.Fatal().Err(err).Msg("Could not open i2c bus")
 	}
 
-	// Initialize TFT framebuffer and display
-	fb := framebuffer.NewDisplayFramebuffer("/dev/fb0")
-	defer fb.Close()
-
 	// Load game config from yml file
 	c := config.NewConfig()
+
+	// Initialize framebuffer and display
+	fb := framebuffer.NewDisplayFramebuffer("/dev/fb0")
+	defer fb.Close()
 
 	// Initialize connection to MiST-interface board. This
 	// contains Joystick inputs, power and reset
@@ -68,7 +69,7 @@ func main() {
 	hid := hid.NewHid()
 	defer hid.Close()
 
-	mistControl := mist.NewMistControl(hid, mistDigital)
+	mistControl := mist.NewMistControl(hid, mistDigital, c.Mist)
 
 	// Initialize connection to panel board and set input processor that
 	// translates the inputs from joysticks and buttons to the configured
@@ -80,22 +81,27 @@ func main() {
 	// Exit handler routine, triggered by signal (see above)
 	go func() {
 		<-quit
+		fb.Clear()
+		// TODO: Add goodbye image
 		log.Info().Msg("Shutting down")
-		//mist.SetPower(false)
-		// give some time to shut down the power pin via i2c
-		//time.Sleep(500 * time.Millisecond)
 		os.Exit(0)
 	}()
 
+	// Set up image cache
+	imageCache := imageCache.NewImageCache(c)
+	imageCache.LoadAll(c)
+
+	// Power on the MiST
 	mistDigital.SetPower(true)
 
-	ui := ui.NewUi(c, fb, panel, inputProcessor, mistControl)
+	// Initialize UI
+	ui := ui.NewUi(c, fb, panel, inputProcessor, mistControl, imageCache, panel.PanelUpdates)
+	go ui.Start()
 
 	rotary := rotary.NewRotary(4, 5, 6, len(c.Games), ui.StartGameById, ui.SelectGameById)
 	go rotary.Run()
 
-	fb.ShowImage("splash.jpg")
-
+	// Sleep forever
 	for {
 		time.Sleep(500 * time.Millisecond)
 	}

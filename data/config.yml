@@ -78,7 +78,7 @@ games:
   - name: E-motion
     core: Amiga
     index: 1
-    image: e-motion.jpg    
+    image: e_motion.jpg    
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
@@ -376,7 +376,7 @@ games:
   - name: Badlands
     core: Amiga
     index: 25
-    image: badlands.jpg
+    image: badlands.png
     mappings:
       - input: P1_JOY
         output: JOY1_AXES
@@ -404,7 +404,6 @@ games:
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1 
-
 
   - name: Wings Of Fury
     core: Amiga
@@ -452,7 +451,7 @@ games:
         output: KEY_MOD_RSHIFT
       - input: P2_JOY_DOWN
         output: KEY_DOWN  
-      - input: P1_JOY_UP
+      - input: P2_JOY_UP
         output: KEY_SPACE  
 
   - name: Rick Dangerous
@@ -475,70 +474,58 @@ games:
       - input: P1_RED
         output: JOY1_BUTTON1          
 
+mist:
+  waitAfterReset: 2000 
+  resetDuration: 1
 
 cores:
   - name: C64
     enter:
       - KEY_DOWN
       - KEY_ENTER
+    exit:
+      - KEY_F12
+      - KEY_RIGHT
+      - KEY_ENTER
+      - KEY_ENTER
     load:
       - KEY_F12
       - KEY_DOWN
       - KEY_ENTER
-      - KEY_WAIT_500
+      - KEY_WAIT_250
       - KEY_HOME
     loadSameCore:
       - KEY_F12
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
-      - KEY_DOWN
+      - KEY_PGDN
       - KEY_ENTER
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_UP
-      - KEY_ENTER
-      - KEY_WAIT_250       
+      - KEY_WAIT_500       
       - KEY_HOME
     run:
-      - KEY_WAIT_750
+      - KEY_WAIT_500
       - KEY_R
       - KEY_U
       - KEY_N
       - KEY_ENTER
-    bootSleep: 10000
+    bootSleep: 5000
     speed1: 50
-    speed2: 50
+    speed2: 40
 
   - name: Amiga
     enter:
       - KEY_DOWN
       - KEY_DOWN
       - KEY_ENTER
+    exit:
+      - KEY_F12
+      - KEY_RIGHT
+      - KEY_RIGHT
+      - KEY_ENTER
+      - KEY_ENTER
     load:
       - KEY_F12
       - KEY_ENTER
       - KEY_HOME
       - KEY_ENTER
-      - KEY_WAIT_500
     loadSameCore:
       - KEY_F12
       - KEY_ENTER
@@ -554,8 +541,104 @@ cores:
       - KEY_ENTER
       - KEY_UP
       - KEY_ENTER
-    bootSleep: 15000
-    speed1: 50
-    speed2: 50
+    bootSleep: 12500
+    speed1: 20
+    speed2: 30
 
- 
+ui:
+  regions:
+    buttonLarge: &buttonLarge
+      width: 65
+      height: 32
+    buttonSmall: &buttonSmall
+      width: 32
+      height: 22
+    horizontalArrow: &horizontalArrow
+      width: 23
+      height: 16
+    verticalArrow: &verticalArrow
+      width: 16
+      height: 23  
+    WHITE_LEFT:
+      <<: *buttonLarge
+      x: 235
+      y: 23
+    WHITE_RIGHT:
+      <<: *buttonLarge
+      x: 299
+      y: 23
+    P1_RED:
+      <<: *buttonLarge
+      x: 60
+      y: 84
+    P1_YELLOW:
+      <<: *buttonLarge
+      x: 128
+      y: 105
+    P1_GREEN:
+      <<: *buttonLarge
+      x: 59
+      y: 140
+    P1_BLUE:
+      <<: *buttonLarge
+      x: 128
+      y: 160
+    P1_JOY_UP:
+      <<: *horizontalArrow
+      x: 226
+      y: 106
+    P1_JOY_DOWN:
+      <<: *horizontalArrow
+      x: 226
+      y: 166
+    P1_JOY_LEFT:
+      <<: *verticalArrow
+      x: 193
+      y: 139
+    P1_JOY_RIGHT:
+      <<: *verticalArrow
+      x: 253
+      y: 139
+    P1_FLIPPER:
+      <<: *buttonSmall
+      x: 21
+      y: 208
+    P2_RED:
+      <<: *buttonLarge
+      x: 354
+      y: 84
+    P2_YELLOW:
+      <<: *buttonLarge
+      x: 422
+      y: 105
+    P2_GREEN:
+      <<: *buttonLarge
+      x: 353
+      y: 140
+    P2_BLUE:
+      <<: *buttonLarge
+      x: 422
+      y: 160
+    P2_JOY_UP:
+      <<: *horizontalArrow
+      x: 529
+      y: 106
+    P2_JOY_DOWN:
+      <<: *horizontalArrow
+      x: 529
+      y: 166
+    P2_JOY_LEFT:
+      <<: *verticalArrow
+      x: 495
+      y: 139
+    P2_JOY_RIGHT:
+      <<: *verticalArrow
+      x: 555
+      y: 139
+    P2_FLIPPER:
+      <<: *buttonSmall
+      x: 548
+      y: 208
+
+
+

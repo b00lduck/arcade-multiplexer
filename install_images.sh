@@ -2,11 +2,11 @@
 
 set -e
 
-go build ./cmd/image-converter
-
 ssh root@arcade "mkdir -p /root/arcade-multiplexer/images"
 
-find data/images -type f -name *.jpg | xargs -n 1 ./image-converter
-
 scp -r data/images root@arcade:/root/arcade-multiplexer
+scp data/artwork/hud_1.jpg root@arcade:/root/arcade-multiplexer/images/
+scp data/artwork/hud_2.jpg root@arcade:/root/arcade-multiplexer/images/
+scp data/artwork/hud_3.jpg root@arcade:/root/arcade-multiplexer/images/
+scp data/artwork/hud_4.jpg root@arcade:/root/arcade-multiplexer/images/
 

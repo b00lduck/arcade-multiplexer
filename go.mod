@@ -10,4 +10,10 @@ require (
 	periph.io/x/periph v3.4.0+incompatible
 )
 
-require golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
+require golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
+
+require (
+	github.com/jmigpin/editor v1.3.8
+	golang.org/x/image v0.17.0
+	golang.org/x/sys v0.18.0 // indirect
+)

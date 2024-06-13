@@ -20,17 +20,30 @@ type MistDigital interface {
 type mistControl struct {
 	hid         Hid
 	mistDigital MistDigital
+	conf        config.Mist
 }
 
-func NewMistControl(h Hid, mistDigital MistDigital) *mistControl {
+func NewMistControl(h Hid, mistDigital MistDigital, conf config.Mist) *mistControl {
 
 	mistDigital.SetResetButton(true)
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(time.Duration(conf.ResetDuration) * time.Millisecond)
 	mistDigital.SetResetButton(false)
 
 	return &mistControl{
 		hid:         h,
-		mistDigital: mistDigital}
+		mistDigital: mistDigital,
+		conf:        conf,
+	}
+}
+
+func (m *mistControl) ExitCore(core *config.Core) {
+
+	if core == nil {
+		return
+	}
+
+	log.Info().Interface("oldCore", core).Msg("Exiting core")
+	m.hid.WriteSequence(core.Exit, 10, 10)
 }
 
 func (m *mistControl) ChangeCore(newCore *config.Core) {
@@ -40,14 +53,9 @@ func (m *mistControl) ChangeCore(newCore *config.Core) {
 		return
 	}
 
-	m.mistDigital.SetResetButton(true)
-	time.Sleep(50 * time.Millisecond)
-	m.mistDigital.SetResetButton(false)
-	time.Sleep(2000 * time.Millisecond)
-
 	log.Info().Interface("newCore", newCore).Msg("Changing core")
 
-	m.hid.WriteSequence(newCore.Enter, 1, 10)
+	m.hid.WriteSequence(newCore.Enter, 10, 10)
 
 	time.Sleep(time.Duration(newCore.BootSleep) * time.Millisecond)
 }

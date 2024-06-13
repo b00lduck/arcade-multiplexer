@@ -43,9 +43,6 @@ func (i *inputProcessor) SetMappings(mappings []config.Mapping) {
 
 func (i *inputProcessor) ProcessMatrix(ms data.MatrixState) {
 
-	//fmt.Println(ms.String())
-	//fmt.Printf("\033[7A")
-
 	i.mutex.Lock()
 
 	i.buttonStates = make([]data.ButtonState, 4)

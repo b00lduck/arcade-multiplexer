@@ -1,11 +1,11 @@
 package hid
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -16,6 +16,8 @@ import (
 // Modifier
 
 */
+
+// see: https://usb.org/sites/default/files/hut1_3_0.pdf
 
 var keyMap = map[string]byte{
 
@@ -30,6 +32,8 @@ var keyMap = map[string]byte{
 	"KEY_DOWN":  0x51,
 	"KEY_RIGHT": 0x4f,
 	"KEY_LEFT":  0x50,
+	"KEY_PGUP":  0x4B,
+	"KEY_PGDN":  0x4E,
 	"KEY_F12":   0x45,
 	"KEY_ENTER": 0x28,
 	"KEY_ESC":   0x29,
@@ -108,21 +112,20 @@ func (h *hid) SetKeys(keys []string) {
 
 func (h *hid) sendRaw(b []byte) error {
 
-	// retry 100 times if error
-	for i := 0; i < 100; i++ {
+	// retry 1000 times if error
+	for i := 0; i < 1000; i++ {
 		err := h.sendRawOnce(b)
 		if err == nil {
-			time.Sleep(100 * time.Millisecond)
 			return nil
 		}
+		time.Sleep(200 * time.Millisecond)
 	}
 
-	err := errors.New("Error writing to hid, giving up")
-	log.Error().Err(err).Msg("Error writing to hid, giving up")
+	err := errors.New("error writing to hid, giving up")
+	log.Error().Err(err)
 
 	return err
 }
-
 
 func (h *hid) sendRawOnce(b []byte) error {
 
@@ -136,7 +139,7 @@ func (h *hid) sendRawOnce(b []byte) error {
 
 func (h *hid) WriteSequence(seq []string, speed1, speed2 uint64) error {
 	for _, v := range seq {
-		log.Info().Str("key", v).Msg("PRESS")
+		log.Info().Str("key", v).Uint64("holdMs", speed1).Uint64("pauseMs", speed2).Msg("PRESS")
 
 		if strings.HasPrefix(v, "KEY_WAIT_") {
 			foo, err := strconv.Atoi(strings.Split(v, "KEY_WAIT_")[1])
