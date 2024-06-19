@@ -7,7 +7,7 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/rs/zerolog/log"
-	"periph.io/x/periph/conn/i2c"
+	"periph.io/x/conn/v3/i2c"
 )
 
 type InputProcessor interface {
@@ -15,7 +15,6 @@ type InputProcessor interface {
 }
 
 type panel struct {
-	state         uint32
 	chips         []i2c.Dev
 	writtenStates []uint8
 	readStates    []uint8
@@ -29,7 +28,6 @@ type panel struct {
 }
 
 /*
-
 	Chip 1
 	------
 	0 O LED white left
@@ -63,7 +61,6 @@ type panel struct {
 	5 I Column 1
 	6 I Column 2
 	7 I Column 3
-
 */
 
 const NUM_ROWS = 4
@@ -83,7 +80,9 @@ func NewPanel(bus i2c.Bus, processor InputProcessor) *panel {
 		chips:          []i2c.Dev{chip0, chip1, chip2},
 		writtenStates:  []uint8{0xff, 0xff, 0xff},
 		readStates:     []uint8{0xff, 0xff, 0xff},
-		inputProcessor: processor}
+		inputProcessor: processor,
+		PanelUpdates:   make(chan data.MatrixState),
+	}
 }
 
 func (o *panel) Run() {
@@ -144,15 +143,15 @@ func (o *panel) decodeMatrix() data.MatrixState {
 
 	case 2:
 		newMatrix.GlobalKeypad.FlipperRight = col0
-		newMatrix.Player2Keypad.Blue = col1
-		newMatrix.Player1Keypad.Blue = col2
+		newMatrix.Player2Keypad.Green = col1
+		newMatrix.Player1Keypad.Green = col2
 		newMatrix.Player1Joystick.Up = col3
 		newMatrix.Player2Joystick.Left = col4
 
 	case 3:
 		newMatrix.GlobalKeypad.FlipperLeft = col0
-		newMatrix.Player2Keypad.Green = col1
-		newMatrix.Player1Keypad.Green = col2
+		newMatrix.Player2Keypad.Blue = col1
+		newMatrix.Player1Keypad.Blue = col2
 		newMatrix.Player1Joystick.Down = col3
 		newMatrix.Player2Joystick.Up = col4
 	}

@@ -18,19 +18,18 @@ func NewImageCache(c *config.Config) *ImageCache {
 func (i *ImageCache) LoadAll(c *config.Config) {
 
 	// Load HUD background
-	i.GetImage(608, 259, "hud_1.jpg")
-	i.GetImage(608, 259, "hud_2.jpg")
-	i.GetImage(608, 259, "hud_3.jpg")
-	i.GetImage(608, 259, "hud_4.jpg")
-	i.GetImage(608, 259, "hud_solid.jpg")
+	i.GetImage(608, 259, "hud_1.jpg", true)
+	i.GetImage(608, 259, "hud_2.jpg", true)
+	i.GetImage(608, 259, "hud_3.jpg", true)
+	i.GetImage(608, 259, "hud_4.jpg", true)
 
 	// Load game covers
 	for _, game := range c.Games {
-		i.GetImage(555, 740, game.Image)
+		i.GetImage(555, 740, game.Image, false)
 	}
 
 }
 
-func (i *ImageCache) GetImage(width, height int, filename string) {
-	i.Images[filename] = framebuffer.NewResizedImageFromImageFile(width, height, filename)
+func (i *ImageCache) GetImage(width, height int, filename string, flip bool) {
+	i.Images[filename] = framebuffer.NewResizedImageFromImageFile(width, height, filename, flip)
 }

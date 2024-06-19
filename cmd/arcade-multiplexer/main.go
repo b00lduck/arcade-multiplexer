@@ -6,8 +6,8 @@ import (
 	"syscall"
 	"time"
 
-	"periph.io/x/periph/conn/i2c/i2creg"
-	"periph.io/x/periph/host"
+	"periph.io/x/conn/v3/i2c/i2creg"
+	"periph.io/x/host/v3"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -48,11 +48,12 @@ func main() {
 		log.Fatal().Err(err).Msg("Could not open initialize periph.io")
 	}
 
-	// Open the first available I²C bus
+	// Use i2creg I²C bus registry to find the first available I²C bus.
 	bus, err := i2creg.Open("")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not open i2c bus")
+		log.Fatal().Err(err).Msg("Could not open I²C bus")
 	}
+	defer bus.Close()
 
 	// Load game config from yml file
 	c := config.NewConfig()
@@ -66,7 +67,7 @@ func main() {
 	mistDigital := mist.NewMistDigital(bus)
 	go mistDigital.Run()
 
-	hid := hid.NewHid()
+	hid := hid.NewHid(c)
 	defer hid.Close()
 
 	mistControl := mist.NewMistControl(hid, mistDigital, c.Mist)
@@ -95,10 +96,10 @@ func main() {
 	mistDigital.SetPower(true)
 
 	// Initialize UI
-	ui := ui.NewUi(c, fb, panel, inputProcessor, mistControl, imageCache, panel.PanelUpdates)
+	ui := ui.NewUi(c, fb, panel, inputProcessor, mistControl, imageCache, &panel.PanelUpdates)
 	go ui.Start()
 
-	rotary := rotary.NewRotary(4, 5, 6, len(c.Games), ui.StartGameById, ui.SelectGameById)
+	rotary := rotary.NewRotary(5, 4, 6, len(c.Games), ui.StartGameById, ui.SelectGameById)
 	go rotary.Run()
 
 	// Sleep forever

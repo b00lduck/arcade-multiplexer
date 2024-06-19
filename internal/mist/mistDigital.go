@@ -5,7 +5,8 @@ import (
 
 	"arcade-multiplexer/internal/data"
 
-	"periph.io/x/periph/conn/i2c"
+	"github.com/rs/zerolog/log"
+	"periph.io/x/conn/v3/i2c"
 )
 
 type mistDigital struct {
@@ -86,6 +87,21 @@ func (o *mistDigital) Run() {
 		}
 		time.Sleep(1 * time.Millisecond)
 	}
+}
+
+func (o *mistDigital) PressButton(joy, btn uint8) {
+
+	sleep1 := 200
+	sleep2 := 100
+
+	id := (joy-1)*2 + (btn - 1)
+	log.Info().Uint8("id", id).Uint8("joy", joy).Uint8("btn", btn).
+		Int("holdMs", sleep1).Int("pauseMs", sleep2).Msg("PRESS button")
+
+	o.SetJoystickButton(id, data.ButtonState{State: true, Autofire: false})
+	time.Sleep(time.Duration(sleep1) * time.Millisecond)
+	o.SetJoystickButton(id, data.ButtonState{State: false, Autofire: false})
+	time.Sleep(time.Duration(sleep2) * time.Millisecond)
 }
 
 func (o *mistDigital) SetJoystickButton(id uint8, bs data.ButtonState) {

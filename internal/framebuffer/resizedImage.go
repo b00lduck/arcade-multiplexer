@@ -18,7 +18,6 @@ type ResizedImage struct {
 	imageutil.BGRA
 	filename      string
 	cacheFilename string
-	
 }
 
 func NewResizedImage(width, height int, filename string) *ResizedImage {
@@ -30,7 +29,7 @@ func NewResizedImage(width, height int, filename string) *ResizedImage {
 	}
 }
 
-func NewResizedImageFromImageFile(width, height int, filename string) *ResizedImage {
+func NewResizedImageFromImageFile(width, height int, filename string, flip bool) *ResizedImage {
 
 	ret := NewResizedImage(width, height, filename)
 
@@ -46,7 +45,7 @@ func NewResizedImageFromImageFile(width, height int, filename string) *ResizedIm
 		ret.Pix = data
 
 	} else {
-		ret.load(filename)
+		ret.load(filename, flip)
 		ret.CacheStore()
 	}
 
@@ -60,7 +59,7 @@ func (f ResizedImage) CacheStore() {
 	}
 }
 
-func (f ResizedImage) load(filename string) {
+func (f ResizedImage) load(filename string, flip bool) {
 	log.Info().Str("filename", filename).Msg("loading image")
 
 	img, err := loadImage("images/" + filename)
@@ -94,6 +93,16 @@ func (f ResizedImage) load(filename string) {
 	}
 
 	draw.NearestNeighbor.Scale(&f.BGRA, dstSize, img, img.Bounds(), draw.Src, nil)
+
+	if flip {
+		f.flipChannels()
+	}
+}
+
+func (f *ResizedImage) flipChannels() {
+	for i := 0; i < len(f.Pix); i += 4 {
+		f.Pix[i], f.Pix[i+2] = f.Pix[i+2], f.Pix[i]
+	}
 }
 
 func loadImage(filename string) (image.Image, error) {

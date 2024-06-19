@@ -1,60 +1,4 @@
-# Mappings
-# 
-# Inputs
-# ------
-# P1_JOY
-# P1_JOY_UP
-# P1_JOY_DOWN
-# P1_JOY_LEFT
-# P1_JOY_RIGHT
-# P1_RED
-# P1_YELLOW
-# P1_GREEN
-# P1_BLUE
-# P1_FLIPPER
-# P2_JOY
-# P2_JOY_UP
-# P2_JOY_DOWN
-# P2_JOY_LEFT
-# P2_JOY_RIGHT
-# P2_RED
-# P2_YELLOW
-# P2_GREEN
-# P2_BLUE
-# P2_FLIPPER
-# WHITE_LEFT
-# WHITE_RIGHT
-#
-#
-# Output
-# ------
-# JOY1_AXES
-# JOY1_UP
-# JOY1_DOWN
-# JOY1_LEFT
-# JOY1_RIGHT
-# JOY1_BUTTON1
-# JOY1_BUTTON2
-# JOY2_AXES
-# JOY2_UP
-# JOY2_DOWN
-# JOY2_LEFT
-# JOY2_RIGHT
-# JOY2_BUTTON1
-# JOY2_BUTTON2
-# KEY_SPACE
-# KEY_ESC
-# KEY_LSHIFT
-# KEY_RSHIFT
-# KEY_1
-# KEY_2
-# KEY_3
-# KEY_4
-# KEY_F1
-# KEY_F2
-
 games:
-
   - name: Drelbs
     core: C64
     index: 1
@@ -100,8 +44,9 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1  
-      - input: WHITE_LEFT
-        output: JOY2_BUTTON1  
+    initSequence:
+      - SLEEP_22000
+      - JOY2_BUTTON1    
 
   - name: Pac Man
     core: C64
@@ -110,10 +55,14 @@ games:
     mappings:
       - input: P1_JOY
         output: JOY2_AXES
+      - input: P2_JOY
+        output: JOY2_AXES
       - input: WHITE_LEFT
         output: KEY_F1         
-      - input: WHITE_RIGHT
-        output: KEY_F3         
+      - input: P2_GREEN
+        output: KEY_F3 
+      - input: P2_BLUE
+        output: KEY_F5        
 
   - name: Bubble Bobble
     core: Amiga
@@ -141,16 +90,23 @@ games:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
-        output: JOY1_BUTTON1  
+        output: JOY1_BUTTON1
+        text: Fire  
       - input: P1_YELLOW
         output: JOY1_BUTTON1
         autofire: true
+        text: Autofire
       - input: P1_BLUE
-        output: KEY_SPACE  
+        output: KEY_SPACE
+        text: Energy line
+      - input: P1_GREEN
+        output: KEY_MOD_LALT
+        text: Grenade  
       - input: WHITE_LEFT
         output: KEY_ESC
-      - input: P2_RED
-        output: JOY2_BUTTON1          
+    initSequence:
+      - SLEEP_8500
+      - JOY2_BUTTON1
 
   - name: Turrican 2
     core: Amiga
@@ -162,27 +118,29 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1  
+        text: Fire
       - input: P1_YELLOW
         output: JOY1_BUTTON1
         autofire: true
+        text: Autofire
       - input: P1_BLUE
-        output: KEY_SPACE  
+        output: KEY_SPACE
+        text: Energy line
+      - input: P2_BLUE
+        output: KEY_MOD_LCTRL
+        text: Pause
       - input: WHITE_LEFT
         output: KEY_ESC
-      - input: P2_RED
-        output: JOY2_BUTTON1  
-
-  - name: MIG 29
-    core: Amiga
-    index: 7
-    image: mig29.jpg
-    mappings:
-      - input: P1_JOY
-        output: JOY1_AXES
-      - input: P1_RED
-        output: JOY1_BUTTON1  
-      - input: WHITE_LEFT
-        output: KEY_1
+    initSequence:
+      - SLEEP_8500
+      - JOY2_BUTTON1  
+      - SLEEP_1000
+      - JOY2_BUTTON1  
+      - SLEEP_1000
+      - JOY2_BUTTON1  
+      - SLEEP_1000
+      - JOY2_BUTTON1  
+      - SLEEP_1000
 
   - name: Pushover
     core: Amiga
@@ -221,14 +179,18 @@ games:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
-        output: JOY1_BUTTON1                  
-      - input: P2_RED
-        output: JOY2_BUTTON1
+        output: JOY1_BUTTON1
+        text: Rotate                
       - input: WHITE_LEFT
         output: KEY_M
+        text: Marathon
       - input: WHITE_RIGHT
         output: KEY_T
-
+        text: Time
+    initSequence:
+      - SLEEP_12000
+      - JOY2_BUTTON1
+      
   - name: Giana Sisters
     core: Amiga
     index: 12
@@ -238,8 +200,12 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
-      - input: P2_RED
-        output: WHITE_LEFT
+        text: Fire
+    initSequence:
+      - SLEEP_10000
+      - JOY2_BUTTON1
+      - SLEEP_15000
+      - JOY1_BUTTON1
 
   - name: International Karate +
     core: Amiga
@@ -250,18 +216,25 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1            
+        text: Fire
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1
+        text: Fire
       - input: WHITE_LEFT
         output: KEY_F1    
       - input: WHITE_RIGHT
         output: KEY_F2
       - input: P1_BLUE
-        output: KEY_T    
+        output: KEY_T
+        text: Trousers    
       - input: P2_BLUE
         output: KEY_T
+        text: Trousers
+    initSequence:
+      - SLEEP_15000
+      - JOY2_BUTTON1
 
   - name: Jumping Jackson
     core: Amiga
@@ -272,8 +245,10 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
-      - input: WHITE_LEFT
-        output: JOY2_BUTTON1     
+        text: Fire
+    initSequence:
+      - SLEEP_12000
+      - JOY2_BUTTON1
 
   - name: Katakis
     core: Amiga
@@ -283,10 +258,12 @@ games:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
+        text: Fire
         output: JOY1_BUTTON1
       - input: P1_YELLOW
         output: JOY1_BUTTON1
         autofire: true
+        text: Autofire
 
   - name: Lotus Esprit Turbo Challenge
     core: Amiga
@@ -297,10 +274,12 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
+        text: Fire
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1
+        text: Fire
 
   - name: Lotus Turbo Challenge 2
     core: Amiga
@@ -311,10 +290,12 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
+        text: Fire
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
-        output: JOY2_BUTTON1    
+        output: JOY2_BUTTON1
+        text: Fire
       - input: WHITE_LEFT
         output: KEY_ENTER      
 
@@ -328,25 +309,12 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
+        text: Fire
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
         output: JOY2_BUTTON1
-
-  - name: Super Cars
-    core: Amiga
-    index: 20
-    disks: 2
-    image: super_cars.jpg
-    mappings:
-      - input: P1_JOY
-        output: JOY1_AXES
-      - input: P1_RED
-        output: JOY1_BUTTON1
-      - input: P2_JOY
-        output: JOY2_AXES
-      - input: P2_RED
-        output: JOY2_BUTTON1        
+        text: Fire
 
   - name: Super Cars II
     core: Amiga
@@ -372,6 +340,7 @@ games:
         output: JOY1_AXES
       - input: P1_RED
         output: JOY1_BUTTON1
+        text: Fire
  
   - name: Badlands
     core: Amiga
@@ -381,15 +350,25 @@ games:
       - input: P1_JOY
         output: JOY1_AXES
       - input: P1_RED
-        output: JOY1_BUTTON1  
+        output: JOY1_BUTTON1
+        text: Fire  
+      - input: P1_BLUE
+        output: KEY_F1
+        text: Joystyle  
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
-        output: JOY2_BUTTON1    
+        output: JOY2_BUTTON1
+        text: Fire    
+      - input: P2_BLUE
+        output: KEY_F2
+        text: Joystyle  
       - input: WHITE_LEFT
         output: KEY_F3
+        text: Sound
       - input: WHITE_RIGHT
         output: KEY_F4
+        text: Reset Laps
 
   - name: Micro Machines
     core: Amiga
@@ -403,7 +382,10 @@ games:
       - input: P2_JOY
         output: JOY2_AXES
       - input: P2_RED
-        output: JOY2_BUTTON1 
+        output: JOY2_BUTTON1
+    initSequence:
+      - SLEEP_11000
+      - JOY2_BUTTON1
 
   - name: Wings Of Fury
     core: Amiga
@@ -441,9 +423,9 @@ games:
         output: KEY_F1
       - input: P2_YELLOW
         output: KEY_F2
-      - input: P2_BLUE
-        output: KEY_F3
       - input: P2_GREEN
+        output: KEY_F3
+      - input: P2_BLUE
         output: KEY_F4
       - input: FLIPPER_LEFT
         output: KEY_MOD_LSHIFT
@@ -492,16 +474,16 @@ cores:
       - KEY_F12
       - KEY_DOWN
       - KEY_ENTER
-      - KEY_WAIT_250
+      - SLEEP_250
       - KEY_HOME
     loadSameCore:
       - KEY_F12
       - KEY_PGDN
       - KEY_ENTER
-      - KEY_WAIT_500       
+      - SLEEP_500       
       - KEY_HOME
     run:
-      - KEY_WAIT_500
+      - SLEEP_500
       - KEY_R
       - KEY_U
       - KEY_N
@@ -530,10 +512,10 @@ cores:
       - KEY_F12
       - KEY_ENTER
       - KEY_ENTER
-      - KEY_WAIT_500       
+      - SLEEP_500       
       - KEY_HOME
     run:
-      - KEY_WAIT_250
+      - SLEEP_250
       - KEY_RIGHT
       - KEY_RIGHT
       - KEY_DOWN
@@ -546,93 +528,122 @@ cores:
     speed2: 30
 
 ui:
-  regions:
+  ymlMacros:
     buttonLarge: &buttonLarge
-      width: 65
+      width: 46
       height: 32
-    buttonSmall: &buttonSmall
-      width: 32
-      height: 22
-    horizontalArrow: &horizontalArrow
-      width: 23
-      height: 16
-    verticalArrow: &verticalArrow
-      width: 16
-      height: 23  
+    tbl: &tbl
+      textbox:
+        x: 50
+        y: 5
+    tbr: &tbr
+      textbox:
+        x: -5
+        y: 15
+        align: right
+
+  regions:
     WHITE_LEFT:
       <<: *buttonLarge
       x: 235
       y: 23
+      textbox:
+        x: 23
+        y: 33
+        align: center
     WHITE_RIGHT:
       <<: *buttonLarge
       x: 299
       y: 23
+      textbox:
+        x: 23
+        y: 33
+        align: center
     P1_RED:
       <<: *buttonLarge
       x: 60
       y: 84
+      <<: *tbl
     P1_YELLOW:
       <<: *buttonLarge
       x: 128
       y: 105
+      <<: *tbr
     P1_GREEN:
       <<: *buttonLarge
       x: 59
       y: 140
+      <<: *tbl
     P1_BLUE:
       <<: *buttonLarge
       x: 128
       y: 160
-    P1_JOY_UP:
-      <<: *horizontalArrow
+      <<: *tbr
+    P1_JOY_UP: &verticalArrow
+      width: 16
+      height: 23
       x: 226
       y: 106
+      textbox:
+        x: 8
+        y: -17
+        align: center
     P1_JOY_DOWN:
-      <<: *horizontalArrow
+      <<: *verticalArrow
       x: 226
       y: 166
-    P1_JOY_LEFT:
-      <<: *verticalArrow
+      textbox:
+        y: 35
+    P1_JOY_LEFT: &horizontalArrow
+      width: 23
+      height: 16
       x: 193
       y: 139
-    P1_JOY_RIGHT:
-      <<: *verticalArrow
+    P1_JOY_RIGHT: 
+      <<: *horizontalArrow
       x: 253
       y: 139
-    P1_FLIPPER:
-      <<: *buttonSmall
+    P1_FLIPPER: &buttonSmall
+      width: 32
+      height: 22
       x: 21
       y: 208
     P2_RED:
       <<: *buttonLarge
       x: 354
       y: 84
+      <<: *tbl
     P2_YELLOW:
       <<: *buttonLarge
       x: 422
       y: 105
+      <<: *tbr
     P2_GREEN:
       <<: *buttonLarge
       x: 353
       y: 140
+      <<: *tbl
     P2_BLUE:
       <<: *buttonLarge
       x: 422
       y: 160
+      <<: *tbr
     P2_JOY_UP:
-      <<: *horizontalArrow
+      <<: *verticalArrow
       x: 529
       y: 106
     P2_JOY_DOWN:
-      <<: *horizontalArrow
+      <<: *verticalArrow
       x: 529
       y: 166
+      textbox:
+        y: 35
     P2_JOY_LEFT:
-      <<: *verticalArrow
+      <<: *horizontalArrow
       x: 495
       y: 139
     P2_JOY_RIGHT:
-      <<: *verticalArrow
+      <<: *horizontalArrow
       x: 555
       y: 139
     P2_FLIPPER:
@@ -640,5 +651,244 @@ ui:
       x: 548
       y: 208
 
+# scancodes see: https://usb.org/sites/default/files/hut1_3_0.pdf
+# page 90.ff
+outputs:
+  JOY1_AXES:
+    alias: J1
+  JOY1_UP:
+    alias: J1 ↑
+  JOY1_DOWN:
+    alias: J1 ↓
+  JOY1_LEFT:
+    alias: J1 ←
+  JOY1_RIGHT:
+    alias: J1 →
+  JOY1_BUTTON1:
+    alias: J1 Fire
+  JOY1_BUTTON2:
+    alias: J1 Fire alt
+  JOY2_AXES:
+    alias: J2
+  JOY2_UP:
+    alias: J2 ↑
+  JOY2_DOWN:
+    alias: J2 ↓
+  JOY2_LEFT:
+    alias: J2 ←
+  JOY2_RIGHT:
+    alias: J2 →
+  JOY2_BUTTON1:
+    alias: J2 Fire
+  JOY2_BUTTON2:
+    alias: J2 Fire alt
+  KEY_SPACE:
+    alias: Space
+    scanCode: 0x2c
+  KEY_ESC:
+    alias: Esc
+    scanCode: 0x29
+  KEY_MOD_LSHIFT:
+    alias: LShift
+    scanCode: 0x02
+  KEY_MOD_RSHIFT:
+    alias: RShift
+    scanCode: 0x20
+  KEY_MOD_LALT:
+    alias: LAlt
+    scanCode: 0xE2
+  KEY_MOD_LCTRL:
+    alias: LCtrl
+    scanCode: 0xE0  
+  KEY_1:
+    alias: 1
+    scanCode: 0x1e
+  KEY_2:
+    alias: 2
+    scanCode: 0x1f
+  KEY_3:
+    alias: 3
+    scanCode: 0x20
+  KEY_4:
+    alias: 4
+    scanCode: 0x21
+  KEY_5:
+    alias: 5
+    scanCode: 0x22
+  KEY_6:
+    alias: 6
+    scanCode: 0x23
+  KEY_7:
+    alias: 7
+    scanCode: 0x24
+  KEY_8:
+    alias: 8
+    scanCode: 0x25
+  KEY_9:
+    alias: 9
+    scanCode: 0x26
+  KEY_0:
+    alias: 0
+    scanCode: 0x27    
+  KEY_F1:
+    alias: F1
+    scanCode: 0x3a
+  KEY_F2:
+    alias: F2
+    scanCode: 0x3b
+  KEY_F3:
+    alias: F3
+    scanCode: 0x3c
+  KEY_F4:
+    alias: F4
+    scanCode: 0x3d
+  KEY_F5:
+    alias: F5
+    scanCode: 0x3e
+  KEY_F6:
+    alias: F6
+    scanCode: 0x3f
+  KEY_F7:
+    alias: F7
+    scanCode: 0x40
+  KEY_F8:
+    alias: F8
+    scanCode: 0x41
+  KEY_F9:
+    alias: F9
+    scanCode: 0x42
+  KEY_F10:
+    alias: F10
+    scanCode: 0x43
+  KEY_F11:
+    alias: F11
+    scanCode: 0x44
+  KEY_F12:
+    alias: F12
+    scanCode: 0x45
+  KEY_ENTER:
+    alias: Enter
+    scanCode: 0x28
+  KEY_A:
+    alias: A
+    scanCode: 0x04
+  KEY_B:
+    alias: B
+    scanCode: 0x05
+  KEY_C:
+    alias: C
+    scanCode: 0x06
+  KEY_D:
+    alias: D
+    scanCode: 0x07
+  KEY_E:
+    alias: E
+    scanCode: 0x08
+  KEY_F:
+    alias: F
+    scanCode: 0x09
+  KEY_G:
+    alias: G
+    scanCode: 0x0a
+  KEY_H:
+    alias: H
+    scanCode: 0x0b
+  KEY_I:
+    alias: I
+    scanCode: 0x0c
+  KEY_J:
+    alias: J
+    scanCode: 0x0d
+  KEY_K:
+    alias: K
+    scanCode: 0x0e
+  KEY_L:
+    alias: L
+    scanCode: 0x0f
+  KEY_M:
+    alias: M
+    scanCode: 0x10
+  KEY_N:
+    alias: N
+    scanCode: 0x11
+  KEY_O:
+    alias: O
+    scanCode: 0x12
+  KEY_P:
+    alias: P
+    scanCode: 0x13
+  KEY_Q:
+    alias: Q
+    scanCode: 0x14
+  KEY_R:
+    alias: R
+    scanCode: 0x15
+  KEY_S:
+    alias: S
+    scanCode: 0x16
+  KEY_T:
+    alias: T
+    scanCode: 0x17
+  KEY_U:
+    alias: U
+    scanCode: 0x18
+  KEY_V:
+    alias: V
+    scanCode: 0x19
+  KEY_W:
+    alias: W
+    scanCode: 0x1a
+  KEY_X:
+    alias: X
+    scanCode: 0x1b
+  KEY_Y:
+    alias: Y
+    scanCode: 0x1c
+  KEY_Z:
+    alias: Z
+    scanCode: 0x1d
+  KEY_UP:
+    alias: ↑
+    scanCode: 0x52
+  KEY_DOWN:
+    alias: ↓
+    scanCode: 0x51
+  KEY_LEFT:
+    alias: ←
+    scanCode: 0x50
+  KEY_RIGHT:
+    alias: →
+    scanCode: 0x4f
+  KEY_HOME:
+    alias: Home
+    scanCode: 0x4a
+  KEY_PGDN:
+    alias: PgDn
+    scanCode: 0x4e
+  KEY_PGUP:
+    alias: PgUp
+    scanCode: 0x4b
 
-
+inputs:
+  - P1_JOY
+  - P1_JOY_UP
+  - P1_JOY_DOWN
+  - P1_JOY_LEFT
+  - P1_JOY_RIGHT
+  - P1_RED
+  - P1_YELLOW
+  - P1_GREEN
+  - P1_BLUE
+  - P2_JOY
+  - P2_JOY_UP
+  - P2_JOY_DOWN
+  - P2_JOY_LEFT
+  - P2_JOY_RIGHT
+  - P2_RED
+  - P2_YELLOW
+  - P2_GREEN
+  - P2_BLUE
+  - WHITE_LEFT
+  - WHITE_RIGHT
+  - FLIPPER_LEFT
+  - FLIPPER_RIGHT
